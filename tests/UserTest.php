@@ -1,32 +1,61 @@
 <?php
 namespace App\Tests;
 
+use App\Entity\User;
+use Carbon\Carbon;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Security\Core\User\User;
 
 
 class UserTest extends TestCase {
+
     private User $user;
 
     protected function setUp(): void
     {
-        $this->user = new User('test@test.fr', 'toto', 'tata', Carbon::now()->subDecades(2));
+        $this->user = new User('Toto', 'Tata', Carbon::now()->subDecades(2), 'toto@yolo.fr', 'azertyuiop' );
         parent::setUp();
     }
-     public function testGetFirstName()
-     {
-         $user = new \App\Entity\User();
-         $user->setFirstname('Lea');
-         $this->assertEquals($user->getFirstname(), 'Lea');
-     }
 
-    public function testNotGetFirstName()
+    public function testIsValidNominal()
     {
-        $user = new \App\Entity\User();
-        $user->setFirstname('Lea');
-        $this->assertNotEquals($user->getFirstname(), 'Leo');
+        $this->assertTrue($this->user->isValid());
     }
 
+    public function testIsNotValidDueToEmptyFirstname()
+    {
+        $this->user->setFirstname('');
+        $this->assertFalse($this->user->isValid());
+    }
+
+    public function testIsNotValidDueToEmptyLastname()
+    {
+        $this->user->setLastname('');
+        $this->assertFalse($this->user->isValid());
+    }
+
+    public function testIsNotValidDueToEmptyEmail()
+    {
+        $this->user->setEmail('');
+        $this->assertFalse($this->user->isValid());
+    }
+
+    public function testIsNotValidDueToBadEmail()
+    {
+        $this->user->setEmail('pasbon');
+        $this->assertFalse($this->user->isValid());
+    }
+
+    public function testIsNotValidDueToBirthdayToYoung()
+    {
+        $this->user->setBirthday(Carbon::now()->subYears(10));
+        $this->assertFalse($this->user->isValid());
+    }
+
+    public function testIsNotValidDueToBirthdayInFuture()
+    {
+        $this->user->setBirthday(Carbon::now()->addDecade());
+        $this->assertFalse($this->user->isValid());
+    }
 
 
 }

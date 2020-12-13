@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Carbon\Carbon;
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -50,6 +52,24 @@ class User implements UserInterface
      * @ORM\Column(type="datetime")
      */
     private $birthday;
+
+    public function __construct( string $firstname, string $lastname, Carbon $birthday, string $email, string $password)
+    {
+        $this->firstname = $firstname;
+        $this->lastname = $lastname;
+        $this->birthday = $birthday;
+        $this->email = $email;
+        $this->password = $password;
+    }
+    public function isValid()
+    {
+        return !empty($this->email)
+            && !empty($this->lastname)
+            && !empty($this->firstname)
+            && !empty($this->password)
+            && filter_var($this->email, FILTER_VALIDATE_EMAIL)
+            && $this->birthday->addYears(13)->isBefore(Carbon::now());
+    }
 
 
     public function getId(): ?int
@@ -153,13 +173,18 @@ class User implements UserInterface
 
         return $this;
     }
-
-    public function getBirthday(): ?\DateTimeInterface
+    /**
+     * @return Carbon
+     */
+    public function getBirthday(): Carbon
     {
         return $this->birthday;
     }
 
-    public function setBirthday(\DateTimeInterface $birthday): self
+    /**
+     * @param Carbon $birthday
+     */
+    public function setBirthday(Carbon $birthday): self
     {
         $this->birthday = $birthday;
 
