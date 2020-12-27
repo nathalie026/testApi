@@ -57,5 +57,15 @@ class UserTest extends TestCase {
         $this->assertFalse($this->user->isValid());
     }
 
+    public function testIsNotValidDueToEmptyPassword()
+    {
+        $this->user->setPassword('');
+        $this->assertFalse($this->user->isValid());
+    }
+    public function testIsNotValidDueToMinPassword()
+    {
+        $this->user->setPassword('ffff');
+        $this->assertFalse($this->user->isValid());
+    }
 
 }

@@ -27,7 +27,6 @@ class RegistrationFormType extends AbstractType
                 'widget' => 'single_text',
                 // this is actually the default format for single_text
                 'format' => 'yyyy-MM-dd',
-                'years' => range(1920, 2007),
                 ])
             ->add('plainPassword', PasswordType::class, [
                 // instead of being set onto the object directly,
