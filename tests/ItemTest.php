@@ -7,6 +7,8 @@ use App\Entity\Todolist;
 use Carbon\Carbon;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Runner\Exception;
+use DateTime;
+use DateInterval;
 
 
 class ItemTest extends TestCase {
@@ -46,7 +48,7 @@ class ItemTest extends TestCase {
 
         public function testIsLengthContent()
     {
-        $this->items->setContent('ef');
+        $this->items->setContent('azz');
         $this->assertTrue($this->items->isValid());
     }
 
