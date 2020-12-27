@@ -79,7 +79,6 @@ class User implements UserInterface
         && strlen($this->password) >= 8
         && filter_var($this->email, FILTER_VALIDATE_EMAIL)
         && $this->birthday->addYears(13)->isBefore(Carbon::now());
-        throw new Exception("Champs Incorrect");        
     }
 
   

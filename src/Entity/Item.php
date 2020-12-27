@@ -35,7 +35,7 @@ class Item
     /**
      * @ORM\Column(type="datetime")
      */
-    private $createdAt;
+    public $createdAt;
 
     public function getId(): ?int
     {
@@ -89,16 +89,18 @@ class Item
 
         return $this;
     }
-
-    public function todoList()
+    public function __construct($name, $content, $createdAt)
     {
-        return $this->belongsTo(Todolist::class);
+        $this->name = $name;
+        $this->content = $content;
+        $this->createdAt = $createdAt;
     }
 
-    public function isValid()
+    public function isValid(): bool
     {
         return !empty($this->name)
             && !empty($this->content)
+            && !empty($this->createdAt)
             && strlen($this->content) <= 1000;
     }
 }
