@@ -19,13 +19,11 @@ class ItemTest extends TestCase {
     {
         parent::setUp();
 
-        $today = new DateTime('now');
-        $createdItemAt = $today->add(new DateInterval('PT45M'));
 
         $this->items = new Item(
-            'nom todo',
+            'nom to do',
             'blabla',
-            $createdItemAt
+            Carbon::now()->subDecades(3)->subMonths(5)->subDays(22),
         );
 
             }
@@ -39,11 +37,22 @@ class ItemTest extends TestCase {
         $this->items->setName('');
         $this->assertFalse($this->items->isValid());
     }
+    public function testIsNameNotEmpty()
+    {
+        $this->items->setName('yooooooo');
+        $this->assertTrue($this->items->isValid());
+    }
 
         public function testIsContentEmpty()
     {
         $this->items->setContent('');
         $this->assertFalse($this->items->isValid());
+    }
+
+    public function testIsContentNotEmpty()
+    {
+        $this->items->setContent('eeeeeeeeeee');
+        $this->assertTrue($this->items->isValid());
     }
 
         public function testIsLengthContent()

@@ -36,7 +36,7 @@ class ToDoListTest extends TestCase {
 
 
         $this->Todolist = $this->getMockBuilder(Todolist::class)
-        ->onlyMethods(['getSizeTodoItemsCount', 'getLastItem', 'sendEmailUser'])
+        ->onlyMethods(['getSizeTodoItemsCount', 'getLastItem', 'sendEmailToUser'])
         ->getMock();
         $this->Todolist->user = $this->user;
         $this->Todolist->expects($this->any())->method('getLastItem')->willReturn($this->items);
@@ -44,8 +44,8 @@ class ToDoListTest extends TestCase {
 
     public function testCanAddItemNominal()
     {
-        $this->Todolist->expects($this->once())->method('actualItemsCount')->willReturn(1);
-        $this->Todolist->expects($this->once())->method('getLastItem')->willReturn($this->items);
+        $this->Todolist->expects($this->any())->method('getSizeTodoItemsCount')->willReturn(1);
+
 
         $canAddItem = $this->Todolist->canAddItem($this->items);
 
