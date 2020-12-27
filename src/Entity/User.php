@@ -8,7 +8,7 @@ use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
-
+use PHPUnit\Runner\Exception;
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
  * @UniqueEntity(fields={"email"}, message="There is already an account with this email")
@@ -53,6 +53,11 @@ class User implements UserInterface
      */
     private $birthday;
 
+    /**
+     * @ORM\OneToOne(targetEntity=Todolist::class, mappedBy="user", cascade={"persist", "remove"})
+     */
+    private $todolist;
+
     public function __construct( string $firstname, string $lastname, Carbon $birthday, string $email, string $password)
     {
         $this->firstname = $firstname;
@@ -61,16 +66,23 @@ class User implements UserInterface
         $this->email = $email;
         $this->password = $password;
     }
+
+ 
+
     public function isValid()
     {
         return !empty($this->email)
-            && !empty($this->lastname)
-            && !empty($this->firstname)
-            && !empty($this->password)
-            && filter_var($this->email, FILTER_VALIDATE_EMAIL)
-            && $this->birthday->addYears(13)->isBefore(Carbon::now());
+        && !empty($this->lastname)
+        && !empty($this->firstname)
+        && !empty($this->password)
+        && strlen($this->password) <= 40
+        && strlen($this->password) >= 8
+        && filter_var($this->email, FILTER_VALIDATE_EMAIL)
+        && $this->birthday->addYears(13)->isBefore(Carbon::now());
+        throw new Exception("Champs Incorrect");        
     }
 
+  
 
     public function getId(): ?int
     {
@@ -187,6 +199,24 @@ class User implements UserInterface
     public function setBirthday(Carbon $birthday): self
     {
         $this->birthday = $birthday;
+
+        return $this;
+    }
+
+    public function getTodolist(): ?Todolist
+    {
+        return $this->todolist;
+    }
+
+    public function setTodolist(?Todolist $todolist): self
+    {
+        $this->todolist = $todolist;
+
+        // set (or unset) the owning side of the relation if necessary
+        $newUser = null === $todolist ? null : $this;
+        if ($todolist->getUser() !== $newUser) {
+            $todolist->setUser($newUser);
+        }
 
         return $this;
     }

@@ -4,6 +4,7 @@ namespace App\Tests;
 use App\Entity\User;
 use Carbon\Carbon;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Runner\Exception;
 
 
 class UserTest extends TestCase {
@@ -12,7 +13,7 @@ class UserTest extends TestCase {
 
     protected function setUp(): void
     {
-        $this->user = new User('Toto', 'Tata', Carbon::now()->subDecades(2), 'toto@yolo.fr', 'azertyuiop' );
+        $this->user = new User('Tata', 'Tata', Carbon::now()->subDecades(2), 'toto@yolo.fr', 'azertyuiop' );
         parent::setUp();
     }
 
@@ -20,6 +21,15 @@ class UserTest extends TestCase {
     {
         $this->assertTrue($this->user->isValid());
     }
+
+    // public function testIsNotValidNominal()
+    // {
+    //     $this->user->setFirstname('');
+    //     $this->user->setLastname('');
+
+    //     $this->expectException('Exception');
+    //     $this->expectExceptionMessage('Champs Incorrect');
+    // }
 
     public function testIsNotValidDueToEmptyFirstname()
     {
@@ -62,10 +72,22 @@ class UserTest extends TestCase {
         $this->user->setPassword('');
         $this->assertFalse($this->user->isValid());
     }
+
     public function testIsNotValidDueToMinPassword()
     {
-        $this->user->setPassword('ffff');
+        $this->user->setPassword('eded');
         $this->assertFalse($this->user->isValid());
     }
 
+    public function testIsNotValidDueToMaxPassword()
+    {
+        $this->user->setPassword('ededferfrzffrefrefreferfeferfrefferferfrefrefreferfrfreferfrefreffersffffffffffffffffs');
+        $this->assertFalse($this->user->isValid());
+    }
+
+    public function testIsValidPassword()
+    {
+        $this->user->setPassword('ededeazer');
+        $this->assertTrue($this->user->isValid());
+    }
 }
