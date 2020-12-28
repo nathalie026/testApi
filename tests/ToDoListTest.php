@@ -11,8 +11,8 @@ use PHPUnit\Runner\Exception;
 
 class ToDoListTest extends TestCase {
 
-    private $user;
-    private $items;
+    private User $user;
+    private $item;
     private $Todolist;
 
 
@@ -20,18 +20,19 @@ class ToDoListTest extends TestCase {
     {
         parent::setUp();
 
-        $this->user = new User(
-            'toto',
-            'tata',
-            Carbon::now()->subDecades(3)->subMonths(5)->subDays(22),
-            'test@test.com',
-            'azertyuioiop',
-        );
 
-        $this->items = new Item(
+        $this->item = new Item(
             'nom to do',
             'description de la todo',
             Carbon::now()->subHour(),
+        );
+
+        $this->user = new User(
+            'toto',
+            'tata',
+            14,
+            'test@test.com',
+            'azertyuioiop',
         );
 
 
@@ -39,7 +40,7 @@ class ToDoListTest extends TestCase {
         ->onlyMethods(['getSizeTodoItemsCount', 'getLastItem', 'sendEmailToUser'])
         ->getMock();
         $this->Todolist->user = $this->user;
-        $this->Todolist->expects($this->any())->method('getLastItem')->willReturn($this->items);
+        $this->Todolist->expects($this->any())->method('getLastItem')->willReturn($this->item);
     }
 
     public function testCanAddItemNominal()
@@ -47,7 +48,7 @@ class ToDoListTest extends TestCase {
         $this->Todolist->expects($this->any())->method('getSizeTodoItemsCount')->willReturn(1);
 
 
-        $canAddItem = $this->Todolist->canAddItem($this->items);
+        $canAddItem = $this->Todolist->canAddItem($this->item);
 
         $this->assertNotNull($canAddItem);
         $this->assertEquals('nom to do', $canAddItem->getName());
@@ -59,7 +60,7 @@ class ToDoListTest extends TestCase {
         $this->expectException('Exception');
         $this->expectExceptionMessage('La ToDoList comporte beaucoup trop d items, maximum 10');
 
-        $canAddItem = $this->Todolist->canAddItem($this->items);
+        $canAddItem = $this->Todolist->canAddItem($this->item);
         $this->assertTrue($canAddItem);
     }
 

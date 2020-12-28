@@ -24,15 +24,16 @@ class Todolist
     private $id;
 
     /**
-     * @ORM\OneToOne(targetEntity=User::class, inversedBy="todolist", cascade={"persist", "remove"})
+     * @ORM\OneToOne(targetEntity=User::class, inversedBy="Todolist", cascade={"persist", "remove"})
      * @ORM\JoinColumn(nullable=false)
      */
     private $user;
 
+
     /**
-     * @ORM\OneToMany(targetEntity=Item::class, mappedBy="Todolist")
+     * @ORM\OneToMany(targetEntity=Item::class, mappedBy="Todolist", , orphanRemoval=true)
      */
-    private $items;
+    private $item;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -46,7 +47,7 @@ class Todolist
 
     public function __construct()
     {
-        $this->items = new ArrayCollection();
+        $this->item = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -70,27 +71,16 @@ class Todolist
     /**
      * @return Collection|Item[]
      */
-    public function getItems(): Collection
+    public function getItem(): Collection
     {
-        return $this->items;
+        return $this->item;
     }
-
-    public function addItem(Item $item): self
-    {
-        if (!$this->items->contains($item)) {
-            $this->items[] = $item;
-            $item->setTodolist($this);
-        }
-
-        return $this;
-    }
-
     public function removeItem(Item $item): self
     {
-        if ($this->items->removeElement($item)) {
+        if ($this->item->removeElement($item)) {
             // set the owning side to null (unless already changed)
-            if ($item->getTodolist() === $this) {
-                $item->setTodolist(null);
+            if ($item->getTodoList() === $this) {
+                $item->setTodoList(null);
             }
         }
 
@@ -102,7 +92,7 @@ class Todolist
         return !empty($this->name)
             && strlen($this->name) <= 255
             && !empty($this->user)
-            && (is_null($this->description) || strlen($this->description) <= 255);
+            && is_null($this->description) || strlen($this->description) <= 255;
     }
 
     /**
@@ -111,14 +101,15 @@ class Todolist
      * @throws Exception
      */
 
-    public function canAddItem(Item $item) : Item {
+    public function canAddItem(Item $item) {
         if (is_null($item) || !$item->isValid()) {
             throw new Exception("Ton item est null ou invalide");
         }
 
-        if (is_null($this->user) || !$this->user->isValid() ) {
+        /* if (is_null($this->user) || !$this->user->isValid() ) {
             throw new Exception("User est null ou invalide");
-        }
+        } */
+
 
         if ($this->getSizeTodoItemsCount() >= 10) {
             throw new Exception("La ToDoList comporte beaucoup trop d items, maximum 10");
@@ -142,11 +133,11 @@ class Todolist
     }
 
     public function getLastItem(): ?Item {
-        return $this->getItems()->last();
+        return $this->getItem()->last();
     }
 
     public function getSizeTodoItemsCount() {
-        return sizeof($this->getItems());
+        return sizeof($this->getItem());
     }
 
     protected function sendEmailToUser()

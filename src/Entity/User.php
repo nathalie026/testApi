@@ -4,16 +4,15 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Carbon\Carbon;
-use DateTime;
+
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Symfony\Component\Security\Core\User\UserInterface;
+
 use PHPUnit\Runner\Exception;
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
- * @UniqueEntity(fields={"email"}, message="There is already an account with this email")
+ * @ORM\Table(name="`user`")
  */
-class User implements UserInterface
+class User
 {
     /**
      * @ORM\Id
@@ -56,7 +55,8 @@ class User implements UserInterface
     /**
      * @ORM\OneToOne(targetEntity=Todolist::class, mappedBy="user", cascade={"persist", "remove"})
      */
-    private $todolist;
+    private $Todolist;
+
 
     public function __construct( string $firstname, string $lastname, int $birthday, string $email, string $password)
     {
@@ -102,19 +102,13 @@ class User implements UserInterface
         return $this;
     }
 
-    /**
-     * A visual identifier that represents this user.
-     *
-     * @see UserInterface
-     */
+
     public function getUsername(): string
     {
         return (string) $this->email;
     }
 
-    /**
-     * @see UserInterface
-     */
+
     public function getRoles(): array
     {
         $roles = $this->roles;
@@ -131,9 +125,7 @@ class User implements UserInterface
         return $this;
     }
 
-    /**
-     * @see UserInterface
-     */
+
     public function getPassword(): string
     {
         return (string) $this->password;
@@ -146,17 +138,12 @@ class User implements UserInterface
         return $this;
     }
 
-    /**
-     * @see UserInterface
-     */
+
     public function getSalt()
     {
         // not needed when using the "bcrypt" algorithm in security.yaml
     }
 
-    /**
-     * @see UserInterface
-     */
     public function eraseCredentials()
     {
         // If you store any temporary, sensitive data on the user, clear it here
@@ -187,9 +174,9 @@ class User implements UserInterface
         return $this;
     }
     /**
-     * @return Carbon
+     * @return 
      */
-    public function getBirthday(): Carbon
+    public function getBirthday()
     {
         return $this->birthday;
     }
@@ -206,19 +193,17 @@ class User implements UserInterface
 
     public function getTodolist(): ?Todolist
     {
-        return $this->todolist;
+        return $this->Todolist;
     }
 
-    public function setTodolist(?Todolist $todolist): self
+    public function setTodolist(?Todolist $Todolist): self
     {
-        $this->todolist = $todolist;
-
-        // set (or unset) the owning side of the relation if necessary
-        $newUser = null === $todolist ? null : $this;
-        if ($todolist->getUser() !== $newUser) {
-            $todolist->setUser($newUser);
+        $this->Todolist = $Todolist;
+        if ($Todolist->getUser() !== $this) {
+            $Todolist->setUser($this);
         }
 
         return $this;
     }
+
 }

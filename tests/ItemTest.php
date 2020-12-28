@@ -13,14 +13,14 @@ use DateInterval;
 
 class ItemTest extends TestCase {
 
-    private $items;
+    private $item;
 
     protected function setUp(): void
     {
         parent::setUp();
 
 
-        $this->items = new Item(
+        $this->item = new Item(
             'nom to do',
             'blabla',
             Carbon::now()->subDecades(3)->subMonths(5)->subDays(22),
@@ -29,42 +29,43 @@ class ItemTest extends TestCase {
             }
         public function testIsValidNominal()
     {
-        $this->assertTrue($this->items->isValid());
+        $this->assertTrue($this->item->isValid());
     }
 
         public function testIsNameEmpty()
     {
-        $this->items->setName('');
-        $this->assertFalse($this->items->isValid());
+        $this->item->setName('');
+        $this->assertFalse($this->item->isValid());
     }
     public function testIsNameNotEmpty()
     {
-        $this->items->setName('yooooooo');
-        $this->assertTrue($this->items->isValid());
-    }
-
-        public function testIsContentEmpty()
-    {
-        $this->items->setContent('');
-        $this->assertFalse($this->items->isValid());
+        $this->item->setName('test');
+        $this->assertTrue($this->item->isValid());
     }
 
     public function testIsContentNotEmpty()
     {
-        $this->items->setContent('eeeeeeeeeee');
-        $this->assertTrue($this->items->isValid());
+        $this->item->setContent('test');
+        $this->assertTrue($this->item->isValid());
     }
+
+        public function testIsContentEmpty()
+    {
+        $this->item->setContent('');
+        $this->assertFalse($this->item->isValid());
+    }
+
 
         public function testIsLengthContent()
     {
-        $this->items->setContent('azz');
-        $this->assertTrue($this->items->isValid());
+        $this->item->setContent('azz');
+        $this->assertTrue($this->item->isValid());
     }
 
         public function testIsDateEmpty()
     {
-        $this->items->setCreatedAt('');
-        $this->assertFalse($this->items->isValid());
+        $this->item->setCreatedAt('');
+        $this->assertFalse($this->item->isValid());
     }
 
 
