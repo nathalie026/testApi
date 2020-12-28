@@ -13,7 +13,7 @@ class UserTest extends TestCase {
 
     protected function setUp(): void
     {
-        $this->user = new User('Tata', 'Tata', Carbon::now()->subDecades(2), 'toto@yolo.fr', 'azertyuiop' );
+        $this->user = new User('Tata', 'Tata', 13, 'toto@yolo.fr', 'azertyuiop' );
         parent::setUp();
     }
 
@@ -22,67 +22,59 @@ class UserTest extends TestCase {
         $this->assertTrue($this->user->isValid());
     }
 
-    // public function testIsNotValidNominal()
-    // {
-    //     $this->user->setFirstname('');
-    //     $this->user->setLastname('');
-
-    //     $this->expectException('Exception');
-    //     $this->expectExceptionMessage('Champs Incorrect');
-    // }
-
     public function testIsNotValidDueToEmptyFirstname()
     {
         $this->user->setFirstname('');
-        $this->assertFalse($this->user->isValid());
+        $exception = $this->user->isValid();
+        $this->assertEquals('Le prénom est vide', $exception->getMessage());
     }
 
     public function testIsNotValidDueToEmptyLastname()
     {
         $this->user->setLastname('');
-        $this->assertFalse($this->user->isValid());
+        $exception = $this->user->isValid();
+        $this->assertEquals('Le nom est vide', $exception->getMessage());
     }
 
     public function testIsNotValidDueToEmptyEmail()
     {
         $this->user->setEmail('');
-        $this->assertFalse($this->user->isValid());
+        $exception = $this->user->isValid();
+        $this->assertEquals('L\'email est vide', $exception->getMessage());
     }
 
     public function testIsNotValidDueToBadEmail()
     {
         $this->user->setEmail('pasbon');
-        $this->assertFalse($this->user->isValid());
+        $exception = $this->user->isValid();
+        $this->assertEquals('Format d\'email non valide', $exception->getMessage());
     }
 
     public function testIsNotValidDueToBirthdayToYoung()
     {
-        $this->user->setBirthday(Carbon::now()->subYears(10));
-        $this->assertFalse($this->user->isValid());
+        $this->user->setBirthday(8);
+        $exception = $this->user->isValid();
+        $this->assertEquals('L\'utilisateur doit  être agé de 13 ans au minimum', $exception->getMessage());
     }
 
-    public function testIsNotValidDueToBirthdayInFuture()
-    {
-        $this->user->setBirthday(Carbon::now()->addDecade());
-        $this->assertFalse($this->user->isValid());
-    }
+    // public function testIsNotValidDueToBirthdayInFuture()
+    // {
+    //     $this->user->setBirthday(Carbon::now()->addDecade());
+    //     $this->assertFalse($this->user->isValid());
+    // }
 
     public function testIsNotValidDueToEmptyPassword()
     {
         $this->user->setPassword('');
-        $this->assertFalse($this->user->isValid());
+        $exception = $this->user->isValid();
+        $this->assertEquals('Le mot de passe est vide', $exception->getMessage());
     }
 
-    public function testIsNotValidDueToMinPassword()
+    public function testIsNotValidDueToLengthPassword()
     {
         $this->user->setPassword('eded');
-        $this->assertFalse($this->user->isValid());
-    }
-
-    public function testIsNotValidDueToMaxPassword()
-    {
-        $this->user->setPassword('ededferfrzffrefrefreferfeferfrefferferfrefrefreferfrfreferfrefreffersffffffffffffffffs');
-        $this->assertFalse($this->user->isValid());
+        $exception = $this->user->isValid();
+        $this->assertEquals('Le mot de passe doit faire entre 8 et 40 caractères', $exception->getMessage());
     }
 
     public function testIsValidPassword()

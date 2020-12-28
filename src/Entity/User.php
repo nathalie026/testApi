@@ -49,7 +49,7 @@ class User implements UserInterface
     private $lastname;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="integer")
      */
     private $birthday;
 
@@ -58,7 +58,7 @@ class User implements UserInterface
      */
     private $todolist;
 
-    public function __construct( string $firstname, string $lastname, Carbon $birthday, string $email, string $password)
+    public function __construct( string $firstname, string $lastname, int $birthday, string $email, string $password)
     {
         $this->firstname = $firstname;
         $this->lastname = $lastname;
@@ -67,21 +67,23 @@ class User implements UserInterface
         $this->password = $password;
     }
 
- 
-
-    public function isValid()
-    {
-        return !empty($this->email)
-        && !empty($this->lastname)
-        && !empty($this->firstname)
-        && !empty($this->password)
-        && strlen($this->password) <= 40
-        && strlen($this->password) >= 8
-        && filter_var($this->email, FILTER_VALIDATE_EMAIL)
-        && $this->birthday->addYears(13)->isBefore(Carbon::now());
+    public function isValid(){
+        if (empty($this->firstname))
+            return new Exception('Le prénom est vide');
+        if (empty($this->lastname))
+            return new Exception('Le nom est vide');
+        if ($this->birthday < 13)
+            return new Exception('L\'utilisateur doit  être agé de 13 ans au minimum');
+        if (empty($this->email))
+            return new Exception('L\'email est vide');
+        if (!filter_var($this->email, FILTER_VALIDATE_EMAIL))
+            return new Exception('Format d\'email non valide');
+        if (empty($this->password))
+            return new Exception('Le mot de passe est vide');
+        if (strlen($this->password) < 8 || strlen($this->password) > 40)
+            return new Exception('Le mot de passe doit faire entre 8 et 40 caractères');
+        return true;
     }
-
-  
 
     public function getId(): ?int
     {
@@ -195,7 +197,7 @@ class User implements UserInterface
     /**
      * @param Carbon $birthday
      */
-    public function setBirthday(Carbon $birthday): self
+    public function setBirthday(int $birthday): self
     {
         $this->birthday = $birthday;
 
