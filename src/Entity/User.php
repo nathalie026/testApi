@@ -4,16 +4,15 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Carbon\Carbon;
-use DateTime;
-use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Symfony\Component\Security\Core\User\UserInterface;
 
+use Doctrine\ORM\Mapping as ORM;
+
+use PHPUnit\Runner\Exception;
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
- * @UniqueEntity(fields={"email"}, message="There is already an account with this email")
+ * @ORM\Table(name="`user`")
  */
-class User implements UserInterface
+class User
 {
     /**
      * @ORM\Id
@@ -49,11 +48,17 @@ class User implements UserInterface
     private $lastname;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="integer")
      */
     private $birthday;
 
-    public function __construct( string $firstname, string $lastname, Carbon $birthday, string $email, string $password)
+    /**
+     * @ORM\OneToOne(targetEntity=Todolist::class, mappedBy="user", cascade={"persist", "remove"})
+     */
+    private $Todolist;
+
+
+    public function __construct( string $firstname, string $lastname, int $birthday, string $email, string $password)
     {
         $this->firstname = $firstname;
         $this->lastname = $lastname;
@@ -61,16 +66,24 @@ class User implements UserInterface
         $this->email = $email;
         $this->password = $password;
     }
-    public function isValid()
-    {
-        return !empty($this->email)
-            && !empty($this->lastname)
-            && !empty($this->firstname)
-            && !empty($this->password)
-            && filter_var($this->email, FILTER_VALIDATE_EMAIL)
-            && $this->birthday->addYears(13)->isBefore(Carbon::now());
-    }
 
+    public function isValid(){
+        if (empty($this->firstname))
+            return new Exception('Le prénom est vide');
+        if (empty($this->lastname))
+            return new Exception('Le nom est vide');
+        if ($this->birthday < 13)
+            return new Exception('L\'utilisateur doit  être agé de 13 ans au minimum');
+        if (empty($this->email))
+            return new Exception('L\'email est vide');
+        if (!filter_var($this->email, FILTER_VALIDATE_EMAIL))
+            return new Exception('Format d\'email non valide');
+        if (empty($this->password))
+            return new Exception('Le mot de passe est vide');
+        if (strlen($this->password) < 8 || strlen($this->password) > 40)
+            return new Exception('Le mot de passe doit faire entre 8 et 40 caractères');
+        return true;
+    }
 
     public function getId(): ?int
     {
@@ -89,19 +102,13 @@ class User implements UserInterface
         return $this;
     }
 
-    /**
-     * A visual identifier that represents this user.
-     *
-     * @see UserInterface
-     */
+
     public function getUsername(): string
     {
         return (string) $this->email;
     }
 
-    /**
-     * @see UserInterface
-     */
+
     public function getRoles(): array
     {
         $roles = $this->roles;
@@ -118,9 +125,7 @@ class User implements UserInterface
         return $this;
     }
 
-    /**
-     * @see UserInterface
-     */
+
     public function getPassword(): string
     {
         return (string) $this->password;
@@ -133,17 +138,12 @@ class User implements UserInterface
         return $this;
     }
 
-    /**
-     * @see UserInterface
-     */
+
     public function getSalt()
     {
         // not needed when using the "bcrypt" algorithm in security.yaml
     }
 
-    /**
-     * @see UserInterface
-     */
     public function eraseCredentials()
     {
         // If you store any temporary, sensitive data on the user, clear it here
@@ -174,9 +174,9 @@ class User implements UserInterface
         return $this;
     }
     /**
-     * @return Carbon
+     * @return 
      */
-    public function getBirthday(): Carbon
+    public function getBirthday()
     {
         return $this->birthday;
     }
@@ -184,10 +184,26 @@ class User implements UserInterface
     /**
      * @param Carbon $birthday
      */
-    public function setBirthday(Carbon $birthday): self
+    public function setBirthday(int $birthday): self
     {
         $this->birthday = $birthday;
 
         return $this;
     }
+
+    public function getTodolist(): ?Todolist
+    {
+        return $this->Todolist;
+    }
+
+    public function setTodolist(?Todolist $Todolist): self
+    {
+        $this->Todolist = $Todolist;
+        if ($Todolist->getUser() !== $this) {
+            $Todolist->setUser($this);
+        }
+
+        return $this;
+    }
+
 }

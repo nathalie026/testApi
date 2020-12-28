@@ -4,6 +4,7 @@ namespace App\Tests;
 use App\Entity\User;
 use Carbon\Carbon;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Runner\Exception;
 
 
 class UserTest extends TestCase {
@@ -12,7 +13,7 @@ class UserTest extends TestCase {
 
     protected function setUp(): void
     {
-        $this->user = new User('Toto', 'Tata', Carbon::now()->subDecades(2), 'toto@yolo.fr', 'azertyuiop' );
+        $this->user = new User('Tata', 'Tata', 13, 'toto@yolo.fr', 'azertyuiop' );
         parent::setUp();
     }
 
@@ -21,51 +22,79 @@ class UserTest extends TestCase {
         $this->assertTrue($this->user->isValid());
     }
 
-    public function testIsNotValidDueToEmptyFirstname()
+    public function testIsNotValidDueToEmptyFirstnameAndReturnException()
     {
         $this->user->setFirstname('');
-        $this->assertFalse($this->user->isValid());
+        $exception = $this->user->isValid();
+        $this->assertEquals('Le prénom est vide', $exception->getMessage());
     }
 
-    public function testIsNotValidDueToEmptyLastname()
+    public function testIsNotValidDueToEmptyLastnameAndReturnException()
     {
         $this->user->setLastname('');
-        $this->assertFalse($this->user->isValid());
+        $exception = $this->user->isValid();
+        $this->assertEquals('Le nom est vide', $exception->getMessage());
     }
 
-    public function testIsNotValidDueToEmptyEmail()
+    public function testIsNotValidDueToEmptyEmailAndReturnException()
     {
         $this->user->setEmail('');
-        $this->assertFalse($this->user->isValid());
+        $exception = $this->user->isValid();
+        $this->assertEquals('L\'email est vide', $exception->getMessage());
     }
 
-    public function testIsNotValidDueToBadEmail()
+    public function testIsNotValidDueToBadEmailAndReturnException()
     {
         $this->user->setEmail('pasbon');
-        $this->assertFalse($this->user->isValid());
+        $exception = $this->user->isValid();
+        $this->assertEquals('Format d\'email non valide', $exception->getMessage());
     }
 
-    public function testIsNotValidDueToBirthdayToYoung()
+    public function testIsNotValidDueToBirthdayToYoungAndReturnException()
     {
-        $this->user->setBirthday(Carbon::now()->subYears(10));
-        $this->assertFalse($this->user->isValid());
+        $this->user->setBirthday(8);
+        $exception = $this->user->isValid();
+        $this->assertEquals('L\'utilisateur doit  être agé de 13 ans au minimum', $exception->getMessage());
     }
 
-    public function testIsNotValidDueToBirthdayInFuture()
-    {
-        $this->user->setBirthday(Carbon::now()->addDecade());
-        $this->assertFalse($this->user->isValid());
-    }
 
-    public function testIsNotValidDueToEmptyPassword()
+    public function testIsNotValidDueToEmptyPasswordAndReturnException()
     {
         $this->user->setPassword('');
-        $this->assertFalse($this->user->isValid());
+        $exception = $this->user->isValid();
+        $this->assertEquals('Le mot de passe est vide', $exception->getMessage());
     }
-    public function testIsNotValidDueToMinPassword()
+
+    public function testIsNotValidDueToLengthPasswordAndReturnException()
     {
-        $this->user->setPassword('ffff');
-        $this->assertFalse($this->user->isValid());
+        $this->user->setPassword('eded');
+        $exception = $this->user->isValid();
+        $this->assertEquals('Le mot de passe doit faire entre 8 et 40 caractères', $exception->getMessage());
     }
+
+    public function testIsValidPassword()
+    {
+        $this->user->setPassword('ededeazer');
+        $this->assertTrue($this->user->isValid());
+    }
+
+    public function testIsValidDueToFirstname()
+    {
+        $this->user->setFirstname('Joe');
+        $this->assertTrue($this->user->isValid());
+    }
+
+    public function testIsValidDueToLastname()
+    {
+        $this->user->setLastname('Biden');
+        $this->assertTrue($this->user->isValid());
+    }
+
+    public function testIsValidDueToEmail()
+    {
+        $this->user->setEmail('joebien@joe.fr');
+        $this->assertTrue($this->user->isValid());
+    }
+
 
 }
