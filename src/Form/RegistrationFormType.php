@@ -23,28 +23,8 @@ class RegistrationFormType extends AbstractType
             ->add('email')
             ->add('lastname')
             ->add('firstname')
-            ->add('birthday', DateType::class, [
-                'widget' => 'single_text',
-                // this is actually the default format for single_text
-                'format' => 'yyyy-MM-dd',
-                ])
-            ->add('plainPassword', PasswordType::class, [
-                // instead of being set onto the object directly,
-                // this is read and encoded in the controller
-                'mapped' => false,
-                'constraints' => [
-                    new NotBlank([
-                        'message' => 'Please enter a password',
-                    ]),
-                    new Length([
-                        'min' => 8,
-                        'minMessage' => 'Your password should be at least {{ limit }} characters',
-                        // max length allowed by Symfony for security reasons
-                        'max' => 40,
-                    ]),
-                ],
-            ])
-        ;
+            ->add('birthday')
+            ->add('password');
     }
 
     public function configureOptions(OptionsResolver $resolver)
