@@ -3,12 +3,13 @@
 namespace App\Entity;
 
 use App\Repository\TodolistRepository;
+use App\Services\EmailService;
 use Carbon\Carbon;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Exception;
-use App\Service\EmailService;
+
 
 
 /**
@@ -31,7 +32,7 @@ class Todolist
 
 
     /**
-     * @ORM\OneToMany(targetEntity=Item::class, mappedBy="Todolist", , orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity=Item::class, mappedBy="Todolist", orphanRemoval=true)
      */
     private $item;
 
@@ -45,10 +46,6 @@ class Todolist
      */
     private $description;
 
-    public function __construct()
-    {
-        $this->item = new ArrayCollection();
-    }
 
     public function getId(): ?int
     {
@@ -87,7 +84,7 @@ class Todolist
         return $this;
     }
 
-    public function isValid(): bool
+    public function isValid()
     {
         return !empty($this->name)
             && strlen($this->name) <= 255
@@ -106,9 +103,9 @@ class Todolist
             throw new Exception("Ton item est null ou invalide");
         }
 
-        /* if (is_null($this->user) || !$this->user->isValid() ) {
+         if (is_null($this->user) || !$this->user->isValid() ) {
             throw new Exception("User est null ou invalide");
-        } */
+        }
 
 
         if ($this->getSizeTodoItemsCount() >= 10) {

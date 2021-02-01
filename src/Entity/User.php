@@ -22,33 +22,28 @@ class User
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=180, unique=true)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $email;
 
-    /**
-     * @ORM\Column(type="json")
-     */
-    private $roles = [];
 
     /**
-     * @var string The hashed password
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $password;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $firstname;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $lastname;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", nullable=true)
      */
     private $birthday;
 
@@ -58,7 +53,8 @@ class User
     private $Todolist;
 
 
-    public function __construct( string $firstname, string $lastname, int $birthday, string $email, string $password)
+//    public function __construct( string $firstname, string $lastname, int $birthday, string $email, string $password)
+    public function __construct( string $firstname=null, string $lastname=null, int $birthday=null, string $email=null, string $password=null)
     {
         $this->firstname = $firstname;
         $this->lastname = $lastname;
@@ -103,32 +99,12 @@ class User
     }
 
 
-    public function getUsername(): string
+
+
+
+    public function getPassword(): ?string
     {
-        return (string) $this->email;
-    }
-
-
-    public function getRoles(): array
-    {
-        $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
-
-        return array_unique($roles);
-    }
-
-    public function setRoles(array $roles): self
-    {
-        $this->roles = $roles;
-
-        return $this;
-    }
-
-
-    public function getPassword(): string
-    {
-        return (string) $this->password;
+        return $this->password;
     }
 
     public function setPassword(string $password): self
@@ -139,16 +115,6 @@ class User
     }
 
 
-    public function getSalt()
-    {
-        // not needed when using the "bcrypt" algorithm in security.yaml
-    }
-
-    public function eraseCredentials()
-    {
-        // If you store any temporary, sensitive data on the user, clear it here
-        // $this->plainPassword = null;
-    }
 
     public function getFirstname(): ?string
     {
@@ -196,7 +162,7 @@ class User
         return $this->Todolist;
     }
 
-    public function setTodolist(?Todolist $Todolist): self
+    public function setTodolist(Todolist $Todolist): self
     {
         $this->Todolist = $Todolist;
         if ($Todolist->getUser() !== $this) {

@@ -68,5 +68,11 @@ class ItemTest extends TestCase {
         $this->assertFalse($this->item->isValid());
     }
 
+    public function testIsNotDateEmpty()
+    {
+        $this->item->setCreatedAt('22/01/2020');
+        $this->assertTrue($this->item->isValid());
+    }
+
 
 }
