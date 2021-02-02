@@ -63,21 +63,22 @@ class User
         $this->password = $password;
     }
 
-    public function isValid(){
+
+    public function isValid()  {
         if (empty($this->firstname))
-            return new Exception('Le prénom est vide');
+            throw new Exception('Le prénom est vide');
         if (empty($this->lastname))
-            return new Exception('Le nom est vide');
+            throw new Exception('Le nom est vide');
         if ($this->birthday < 13)
-            return new Exception('L\'utilisateur doit  être agé de 13 ans au minimum');
+            throw new Exception('L\'utilisateur doit  être agé de 13 ans au minimum');
         if (empty($this->email))
-            return new Exception('L\'email est vide');
+            throw new Exception('L\'email est vide');
         if (!filter_var($this->email, FILTER_VALIDATE_EMAIL))
-            return new Exception('Format d\'email non valide');
+            throw new Exception('Format d\'email non valide');
         if (empty($this->password))
-            return new Exception('Le mot de passe est vide');
+            throw new Exception('Le mot de passe est vide');
         if (strlen($this->password) < 8 || strlen($this->password) > 40)
-            return new Exception('Le mot de passe doit faire entre 8 et 40 caractères');
+            throw new Exception('Le mot de passe doit faire entre 8 et 40 caractères');
         return true;
     }
 

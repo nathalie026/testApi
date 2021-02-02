@@ -26,24 +26,10 @@ class UserController extends AbstractController
         $form->submit($request->request->all());
         $isValid = $user->isValid();
         if ($form->isValid() || $isValid) {
-//            mettre les conditions pour créer un user
-            if(!empty($em->getRepository(User::class)->find($user->getFirstname()))) {
-                return new JsonResponse("ERROR : Firstname empty", 500);
-            }
-            if(!empty($em->getRepository(User::class)->find($user->getLastname()))) {
-                return new JsonResponse("ERROR : Lastname empty", 500);
-            }
-            if(!empty($em->getRepository(User::class)->find($user->getBirthday()))) {
-                return new JsonResponse("ERROR : Birthday empty", 500);
-            }
-            if(!empty($em->getRepository(User::class)->find($user->getEmail()))) {
-                return new JsonResponse("ERROR : Email empty", 500);
-            }
-            if(!empty($em->getRepository(User::class)->find($user->getPassword()))) {
-                return new JsonResponse("ERROR : Password empty", 500);
-            }
 
-
+            if(!$user->isValid()){
+                return new JsonResponse("ERROR : something wrong !",500);
+            }
 
             $em->persist($user);
             $em->flush();

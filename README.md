@@ -12,6 +12,5 @@
     
 * TODO :
     * Tests d'intégrations
-        * User
-            * Controller : ajuster le isValid depuis l'entité car pas pris en compte dans le controller
-            * Afficher les messages d'erreurs lors des requêtes
+        * Todolist
+            * ajout login dans userController
