@@ -14,4 +14,4 @@
     * Tests d'intégrations
         * User
             * Controller : ajuster le isValid depuis l'entité car pas pris en compte dans le controller
-            * Régler le problème car lancement du test par ligne de commande failed
+            * Afficher les messages d'erreurs lors des requêtes

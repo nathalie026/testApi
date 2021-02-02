@@ -21,18 +21,37 @@ class UserController extends AbstractController
      */
     public function createUser(Request $request, EntityManagerInterface $em): Response
     {
-//        $user = new User("fff","ggg","13");
         $user = new User();
         $form = $this->createForm(RegistrationFormType::class,$user);
         $form->submit($request->request->all());
-        if ($form->isValid()) {
+        $isValid = $user->isValid();
+        if ($form->isValid() || $isValid) {
+//            mettre les conditions pour créer un user
+            if(!empty($em->getRepository(User::class)->find($user->getFirstname()))) {
+                return new JsonResponse("ERROR : Firstname empty", 500);
+            }
+            if(!empty($em->getRepository(User::class)->find($user->getLastname()))) {
+                return new JsonResponse("ERROR : Lastname empty", 500);
+            }
+            if(!empty($em->getRepository(User::class)->find($user->getBirthday()))) {
+                return new JsonResponse("ERROR : Birthday empty", 500);
+            }
+            if(!empty($em->getRepository(User::class)->find($user->getEmail()))) {
+                return new JsonResponse("ERROR : Email empty", 500);
+            }
+            if(!empty($em->getRepository(User::class)->find($user->getPassword()))) {
+                return new JsonResponse("ERROR : Password empty", 500);
+            }
+
+
+
             $em->persist($user);
             $em->flush();
 
-            return new JsonResponse("Controller : response : user create", 201);
+            return new JsonResponse("SUCCESS : user created", 201);
 
         }
 
-        return new JsonResponse("Oops, something is wrong...", 500);
+        return new JsonResponse("ERROR : Oops, something is wrong...", 500);
     }
 }
