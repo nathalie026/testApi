@@ -25,12 +25,12 @@ class UserController extends AbstractController
         $user = new User();
         $form = $this->createForm(RegistrationFormType::class,$user);
         $form->submit($request->request->all());
-
         if ($form->isValid()) {
-            $em->persist($form->getData());
+            $em->persist($user);
             $em->flush();
 
             return new JsonResponse("Controller : response : user create", 201);
+
         }
 
         return new JsonResponse("Oops, something is wrong...", 500);

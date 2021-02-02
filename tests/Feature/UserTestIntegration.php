@@ -28,7 +28,7 @@ class UserTestIntegration extends WebTestCase
             "password" => "azertyuiop",
         ];
 
-        $this->client = static::createClient();
+//        $this->client = static::createClient();
     }
 
 //    // Test d'intégration requête OK pour création suer
@@ -54,7 +54,7 @@ class UserTestIntegration extends WebTestCase
 
 
     // Test d'intégration requête OK pour création suer
-    public function testadd()
+    public function testAddUserOk()
     {
         $this->user = [
             "firstname" => "Tata",

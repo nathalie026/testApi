@@ -9,3 +9,9 @@
 * Lancer les tests 
     * Lancer l'ensemble des tests : `php vendor/bin/phpunit`
     * Lancer un test spécifique (i.e ToDoListTest.php): `php vendor/bin/phpunit tests/Unit/ToDoListTest.php`
+    
+* TODO :
+    * Tests d'intégrations
+        * User
+            * Controller : ajuster le isValid depuis l'entité car pas pris en compte dans le controller
+            * Régler le problème car lancement du test par ligne de commande failed
