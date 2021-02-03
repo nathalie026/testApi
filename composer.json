@@ -44,6 +44,8 @@
         "twig/twig": "^2.12|^3.0"
     },
     "require-dev": {
+        "ext-json": "*",
+        "dama/doctrine-test-bundle": "^6.5",
         "phpunit/phpunit": "^9.5",
         "symfony/browser-kit": "^5.2",
         "symfony/css-selector": "^5.2",
@@ -52,8 +54,7 @@
         "symfony/phpunit-bridge": "^5.2",
         "symfony/stopwatch": "^5.2",
         "symfony/var-dumper": "^5.2",
-        "symfony/web-profiler-bundle": "^5.2",
-      "ext-json": "*"
+        "symfony/web-profiler-bundle": "^5.2"
     },
     "config": {
         "optimize-autoloader": true,
