@@ -41,7 +41,7 @@ class UserTestIntegration extends WebTestCase
             "firstname" => "Tata",
             "lastname" => "Toto",
             "birthday" => 15,
-            "email" => "blue@yolo.fr",
+            "email" => "bluetoto@yolo.fr",
             "password" => "azertyuiop",
         ];
 

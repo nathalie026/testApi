@@ -24,8 +24,8 @@ class UserController extends AbstractController
         $user = new User();
         $form = $this->createForm(RegistrationFormType::class,$user);
         $form->submit($request->request->all());
-        $isValid = $user->isValid();
-        if ($form->isValid() || $isValid) {
+
+        if ($form->isValid()) {
 
             if(!$user->isValid()){
                 return new JsonResponse("ERROR : something wrong !",500);
@@ -40,4 +40,6 @@ class UserController extends AbstractController
 
         return new JsonResponse("ERROR : Oops, something is wrong...", 500);
     }
+
+    // créer méthode login
 }
