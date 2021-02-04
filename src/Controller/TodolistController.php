@@ -37,8 +37,9 @@ class TodolistController extends AbstractController
             return new JsonResponse("ERROR : User already has a todolist...", 500);
         }
         if ($form->isValid()) {
-            $todolist->setName("My todolist");
-            $todolist->setDescription("My description...");
+            if(!$todolist->isValid()){
+                return new JsonResponse("ERROR : something wrong !", 500);
+            }
             $todolist->setUser($this->getUser());
             $em->persist($todolist);
             $em->flush();
@@ -96,7 +97,7 @@ class TodolistController extends AbstractController
         }
         if ($this->getUser()->getTodolist()) {
             $todolist = $this->getUser()->getTodolist();
-            return new JsonResponse("SUCCESS : Here's your todolist : Name : " . $todolist->getName() . " Description : " . $todolist->getDescription(), 201);
+            return new JsonResponse("SUCCESS : Here's your todolist : Name : " . $todolist->getName() . " Description : " . $todolist->getDescription(), 200);
         }
 
         return new JsonResponse("ERROR : Oops, something went wrong...", 500);
