@@ -8,9 +8,5 @@
 * `php -S localhost:8000 -t public` 
 * Lancer les tests 
     * Lancer l'ensemble des tests : `php vendor/bin/phpunit`
-    * Lancer un test spécifique (i.e ToDoListTest.php): `php vendor/bin/phpunit tests/Unit/ToDoListTest.php`
-    
-* TODO :
-    * Tests d'intégrations
-        * Todolist
-            * ajout login dans userController
+    * Lancer un test spécifique (i.e ToDoListTest.php): `php vendor/bin/phpunit tests/Unit/ToDoListTest.php`, `php vendor/bin/phpunit tests/Feature/UserTestIntegration.php` 
+    * Importer les tests d'intégration sur Postman

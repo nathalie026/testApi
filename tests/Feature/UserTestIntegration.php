@@ -6,6 +6,8 @@ use App\Entity\User;
 use Carbon\Carbon;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use PHPUnit\Runner\Exception;
+use App\Repository\UserRepository;
+
 
 class UserTestIntegration extends WebTestCase
 
@@ -24,7 +26,7 @@ class UserTestIntegration extends WebTestCase
             "firstname" => "Tata",
             "lastname" => "Toto",
             "birthday" => 13,
-            "email" => "toto@yolo.fr",
+            "email" => "testest@yolo.fr",
             "password" => "azertyuiop",
         ];
 
@@ -38,12 +40,13 @@ class UserTestIntegration extends WebTestCase
         // GIVEN
        // on mock un user et un client
         $this->user = [
-            "firstname" => "Tata",
-            "lastname" => "Toto",
+            "firstname" => "Taa",
+            "lastname" => "Tto",
             "birthday" => 15,
-            "email" => "bluetoto@yolo.fr",
+            "email" => "tr@yolo.fr",
             "password" => "azertyuiop",
         ];
+        
 
         $this->client = static::createClient();
 
@@ -54,6 +57,21 @@ class UserTestIntegration extends WebTestCase
 // Et donc en retour, ce qu'on doit obtenir de cet appel, c'est le code 201 qui permet de dire que le user a été créé
 
         $this->assertEquals(201, $this->client->getResponse()->getStatusCode());
+    }
+
+    public function testVisitingWhileLoggedIn()
+    {
+        $client = static::createClient();
+
+        $userRepository = static::$container->get(UserRepository::class);
+        $testUser = $userRepository->findOneByEmail('blu@yolo.fr');
+
+        $client->loginUser($testUser);
+
+        // le user est connecté, on vérifie la présence des éléments de la page où il est redirigé
+        $client->request('GET', '/profile');
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorTextContains('h1', 'User logged successfully');
     }
 
     public function testUserSoYoung()
@@ -127,7 +145,7 @@ class UserTestIntegration extends WebTestCase
             "firstname" => "Tata",
             "lastname" => "Toto",
             "birthday" => 15,
-            "email" => "meme@yolo.fr",
+            "email" => "ssszsz@yolo.fr",
             "password" => "azertyuiop",
         ];
 
