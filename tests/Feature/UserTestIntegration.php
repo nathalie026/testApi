@@ -26,7 +26,7 @@ class UserTestIntegration extends WebTestCase
             "firstname" => "Tata",
             "lastname" => "Toto",
             "birthday" => 13,
-            "email" => "sasou@yolo.fr",
+            "email" => "testest@yolo.fr",
             "password" => "azertyuiop",
         ];
 
@@ -43,7 +43,7 @@ class UserTestIntegration extends WebTestCase
             "firstname" => "Taa",
             "lastname" => "Tto",
             "birthday" => 15,
-            "email" => "traauc@yolo.fr",
+            "email" => "tr@yolo.fr",
             "password" => "azertyuiop",
         ];
         
@@ -145,7 +145,7 @@ class UserTestIntegration extends WebTestCase
             "firstname" => "Tata",
             "lastname" => "Toto",
             "birthday" => 15,
-            "email" => "sszszszsz@yolo.fr",
+            "email" => "ssszsz@yolo.fr",
             "password" => "azertyuiop",
         ];
 

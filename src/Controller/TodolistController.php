@@ -67,6 +67,31 @@ class TodolistController extends AbstractController
         return new JsonResponse("ERROR : Oops, something went wrong...", 500);
     }
 
+    /**
+     * @Route("/todolistInte", name="todolist_inte", methods={"POST"})
+     */
+    public function createTodolistInte(Request $request, EntityManagerInterface $em): Response
+    {
+        $todolist = new Todolist();
+        $form = $this->createForm(TodolistType::class,$todolist);
+        $form->submit($request->request->all());
+
+        if ($form->isValid()) {
+
+            if(!$todolist->isValid()){
+                return new JsonResponse("ERROR : something wrong !", 500);
+            }
+
+            $em->persist($todolist);
+            $em->flush();
+
+            return new JsonResponse("SUCCESS : todolist created", 201);
+
+        }
+
+        return new JsonResponse("ERROR : Oops, something is wrong...", 500);
+    }
+
 
     // créer une fonction pour l'ajout d'item
 }

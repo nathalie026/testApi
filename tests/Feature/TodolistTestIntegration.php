@@ -2,16 +2,20 @@
 
 namespace App\Tests;
 
+use App\Entity\User;
 use App\Entity\Todolist;
+use App\Repository\UserRepository;
 use Carbon\Carbon;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use PHPUnit\Runner\Exception;
+
 
 class TodolistTestIntegration extends WebTestCase
 
 
 {
     private $user;
+    private $todolist;
     private $client;
 
     protected function setUp(): void
@@ -27,29 +31,97 @@ class TodolistTestIntegration extends WebTestCase
         ];
         $this->todolist = [
             'name' => "ma Todolist",
-            'description' => 'hello, this is my description'
+            'description' => 'hello, this is my description',
+            'user' => $this->user
         ];
 
         // mocker un ou des items
     }
 
 
-
-    public function testCreateTodolist()
+    /*
+    * @test
+    * login
+    */
+    public function testVisitingWhileLoggedIn()
     {
-        // GIVEN
+        $client = static::createClient();
 
-        //WHEN
-        $this->client->request('POST', '/createuser',$this->user);
+        $userRepository = static::$container->get(UserRepository::class);
+        $testUser = $userRepository->findOneByEmail('blu@yolo.fr');
 
-        // THEN
+        $client->loginUser($testUser);
 
-        $this->assertEquals(201, $this->client->getResponse()->getStatusCode());
+        // le user est connecté, on vérifie la présence des éléments de la page où il est redirigé
+        $client->request('GET', '/profile');
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorTextContains('h1', 'User logged successfully');
     }
 
 
-    // TEST si user est login
-    // TEST si user a déjà une todolist
+    /*
+    * @test
+    * create todolist
+    */
+    public function testCreateTodolist()
+    {
+        // GIVEN
+        // on mock un user, une todolist et un client
+        $this->user = [
+            "firstname" => "Taa",
+            "lastname" => "Tto",
+            "birthday" => 15,
+            "email" => "tr@y.fr",
+            "password" => "azertyuiop",
+        ];
+        $this->todolist = [
+            "name" => "My todolist",
+            "description" => "My description...",
+            "user_id" => $this->user,
+        ];
+        
+
+        $this->client = static::createClient();
+
+        // WHEN
+        $this->client->request('POST', '/todolistInte', $this->todolist);
+
+        // THEN
+        $this->assertEquals(201, $this->client->getResponse()->getStatusCode());
+    }
+
+    /** @test 
+    * user already has todolist
+    */
+    public function userAlreadyHasTodolist()
+    {
+        // GIVEN
+        // on mock un user, une todolist et un client
+        $this->user = [
+            "firstname" => "Taa",
+            "lastname" => "Tto",
+            "birthday" => 15,
+            "email" => "tr@y.fr",
+            "password" => "azertyuiop",
+        ];
+        $this->todolist = [
+            "name" => "My todolist",
+            "description" => "My description...",
+            "user" => $this->user,
+        ];
+        
+
+        $this->client = static::createClient();
+
+        //WHEN
+        $this->client->request('POST', '/todolist', $this->todolist);
+
+        // THEN
+        $this->assertEquals(500, $this->client->getResponse()->getStatusCode());
+    }
+
+    
+
     // TEST la todolist maximum 10 items
     // TEST si ajout item on todolist is success
     // TEST ajout item trop récent; 30mmn between another add

@@ -29,7 +29,7 @@ class UserController extends AbstractController
         if ($form->isValid()) {
 
             if(!$user->isValid()){
-                return new JsonResponse("ERROR : something wrong !",500);
+                return new JsonResponse("ERROR : something wrong !", 500);
             }
 
             $em->persist($user);
