@@ -14,8 +14,12 @@ use Carbon\Carbon;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 
 
+// si ça ne marche pas, je pense qu'on doit ajouter un login dans UserController
+// Quand un user est crée alors il est automatiquement loguer
+// car user_id est null
 class TodolistController extends AbstractController
 {
     /**
@@ -23,36 +27,14 @@ class TodolistController extends AbstractController
      */
     public function createTodolist(Request $request, EntityManagerInterface $em): Response
     {
-        $todolist= new Todolist();
-        $form = $this->createForm(TodolistType::class,$todolist);
+        $todolist = new Todolist();
+        $form = $this->createForm(TodolistType::class, $todolist);
         $form->submit($request->request->all());
-        if(!$this->getUser())
-        {
+        if (!$this->getUser()) {
             return new JsonResponse("ERROR : You aren't logged in...", 500);
         }
-        if($this->getUser()->getTodolist())
-        {
+        if ($this->getUser()->getTodolist()) {
             return new JsonResponse("ERROR : User already has a todolist...", 500);
-        // si ça ne marche pas, je pense qu'on doit ajouter un login dans UserController
-        // Quand un user est crée alors il est automatiquement loguer
-        // car user_id est null
-
-        // Un utilisateur ne peut avoir qu'une seule todolist
-        // - Une todolist peut avoir un nom et une description
-        // - Un item doit obligatoirement avoir un nom (unique pour une même liste), et peut avoir une description
-        // (jusqu'à 1000 caractères)
-        // - Un délai de 30 min doit être respecté entre l'ajout de 2 items dans une même todolist
-        // - Un item ne peut être ajouté à une liste que si le propriétaire de la liste est valide
-        // // return !empty($this->name)
-        // // && strlen($this->name) <= 255
-        // // && !empty($this->user)
-        // // && is_null($this->description) || strlen($this->description) <= 255;
-        // // TEST si user est login
-        // // TEST si user a déjà une todolist
-        // // TEST la todolist maximum 10 items
-        // // TEST si ajout item on todolist is success
-        // // TEST ajout item trop récent; 30mmn between another add
-
         }
         if ($form->isValid()) {
             $todolist->setName("My todolist");
@@ -62,7 +44,6 @@ class TodolistController extends AbstractController
             $em->flush();
 
             return new JsonResponse("SUCCESS : Todolist created", 201);
-
         }
 
         return new JsonResponse("ERROR : Oops, something went wrong...", 500);
@@ -73,16 +54,13 @@ class TodolistController extends AbstractController
      */
     public function showTodolist(Request $request)
     {
-        if(!$this->getUser())
-        {
+        if (!$this->getUser()) {
             return new JsonResponse("ERROR : You aren't logged in...", 500);
         }
-        if(!$this->getUser()->getTodolist())
-        {
+        if (!$this->getUser()->getTodolist()) {
             return new JsonResponse("ERROR : You have to create a todolist...", 500);
         }
-        if($this->getUser()->getTodolist())
-        {
+        if ($this->getUser()->getTodolist()) {
             $todolist = $this->getUser()->getTodolist();
             return new JsonResponse("SUCCESS : Here's your todolist : Name : " . $todolist->getName() . " Description : " . $todolist->getDescription(), 201);
         }
@@ -122,55 +100,41 @@ class TodolistController extends AbstractController
      */
     public function addItem(Request $request, EntityManagerInterface $em, UserRepository $repository): Response
     {
-        $email = $request->headers->get('php-auth-user');
-        $password = $request->headers->get('php-auth-pw');
-
-        // Verifier que l'utilisateur existe et que le password renseigne est correct
-        //retrieveUser(email, password);  => User.find(email=email, password=password)
-        $user = $repository->findOneBy([
-            'email' => $email,
-            'password' => $password
-        ]);
-
-        // si c'est null ou empty -> retourne erreur, utilisateur n'existe pas ou mal authentifie
-        if (empty($user)) {
-            return new JsonResponse("ERROR : user doesn't exist or wrong authentication...", 500);
+        if (!$this->getUser()) {
+            return new JsonResponse("ERROR : You aren't logged in...", 500);
         }
-        // recuperer la todolist associe a l'utilisateur, si elle n'existe pas retourner erreur
+        if (!$this->getUser()->getTodolist()) {
+            return new JsonResponse("ERROR : You have to create a todolist...", 500);
+        }
+        $todolist = $this->getUser()->getTodoList();
         // verifier que la todolist est valide
         // si c'est pas valide, retourne erreur
-        if (!$user->getTodolist()->isValid()) {
+        if (!$todolist->isValid()) {
             return new JsonResponse("ERROR : user's toDoList is invalid...", 500);
         }
+
         // si c'est valdie, tu crees l'item et tu verifie que l'item est ok
-        $item = new Item('', '', Carbon::now());
+        $item = new Item("", "", Carbon::now());
+
         $formItem = $this->createForm(ItemType::class, $item);
+
         $formItem->submit($request->request->all());
+
         if (!$formItem->isValid()) {
-            return new JsonResponse("ERROR : item is wrong !", 500);
+            return new JsonResponse("ERROR : item is invalid !", 500);
+            $em->persist($item);
         }
         $em->persist($item);
-        $em->flush();
+
         try {
-            $user->getTodolist()->canAddItem($item);
-        } catch (Exceptionn $e) {
-            return new JsonResponse("ERROR : item is wrong !", 500);
-            throw $e;
+            if ($todolist->canAddItem($item)) {
+                $item->setTodolist($todolist);
+                $em->persist($todolist);
+                $em->flush();
+                return new JsonResponse("SUCESS : item " . $item->getName() . " " . $item->getContent() . ' added', 201);
+            }
+        } catch (Exception $e) {
+            return new JsonResponse("ERROR : " . $e->getMessage(), 500);
         }
-
-        // retrieveUsersTodolist(user_name)
-        // $item = new Item();
-        // $formItem = $this->createForm(ItemType::class, $item);
-        // $formItem->submit($request->request->all());
-        // if ($formItem->isValid()) {
-
-        //     if(!$item->isValid()){
-        //         return new JsonResponse("ERROR : something wrong !",500);
-        //     }
-
-        return new JsonResponse("Success...", 200);
     }
-
-    // function retrieveUsersTodolist(todolist_id) {
-    // recupere user depuis header Authorization
 }

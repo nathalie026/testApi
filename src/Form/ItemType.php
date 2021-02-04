@@ -12,9 +12,7 @@ class ItemType extends AbstractType
     {
         $builder
             ->add('name')
-            ->add('description')
-            ->add('created_at')
-        ;
+            ->add('content');
     }
 
     public function configureOptions(OptionsResolver $resolver)

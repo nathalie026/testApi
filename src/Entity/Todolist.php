@@ -33,6 +33,7 @@ class Todolist
 
     /**
      * @ORM\OneToMany(targetEntity=Item::class, mappedBy="Todolist", orphanRemoval=true)
+     * @ORM\OrderBy({"createdAt" = "ASC"})
      */
     private $item;
 
@@ -98,12 +99,13 @@ class Todolist
      * @throws Exception
      */
 
-    public function canAddItem(Item $item) {
+    public function canAddItem(Item $item)
+    {
         if (is_null($item) || !$item->isValid()) {
             throw new Exception("Ton item est null ou invalide");
         }
 
-         if (is_null($this->user) || !$this->user->isValid() ) {
+        if (is_null($this->user) || !$this->user->isValid()) {
             throw new Exception("User est null ou invalide");
         }
 
@@ -122,18 +124,22 @@ class Todolist
 
     public function AlertEightItems()
     {
-        if($this->getSizeTodoItemsCount() == 8)
-        {
+        if ($this->getSizeTodoItemsCount() == 8) {
             $this->sendEmailToUser();
             return true;
         }
     }
 
-    public function getLastItem(): ?Item {
+    public function getLastItem(): ?Item
+    {
+        if (!$this->getItem()->last()) {
+            return null;
+        };
         return $this->getItem()->last();
     }
 
-    public function getSizeTodoItemsCount() {
+    public function getSizeTodoItemsCount()
+    {
         return sizeof($this->getItem());
     }
 
@@ -141,7 +147,7 @@ class Todolist
     {
         $emailService = new EmailService();
         $mailer = new \Swift_Mailer();
-        $emailService->sendMail('Il vous reste 2 items',$this->user->getEmail(), $mailer);
+        $emailService->sendMail('Il vous reste 2 items', $this->user->getEmail(), $mailer);
     }
 
     public function getName(): ?string
