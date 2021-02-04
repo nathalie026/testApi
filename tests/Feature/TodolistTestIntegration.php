@@ -25,6 +25,21 @@ class TodolistTestIntegration extends WebTestCase
 
         $this->client = static::createClient();
         $this->em = $this->client->getContainer()->get('doctrine.orm.entity_manager');
+
+        // on cree un utilisateur et se log avec
+        $this->user = new User();
+        $this->user->setFirstname("Titi");
+        $this->user->setLastname("Toto");
+        $this->user->setBirthday(15);
+        $this->user->setEmail("meme@yolo.fr");
+        $this->user->setPassword("azertyuiop");
+        $this->em->persist($this->user);
+        $this->em->flush();
+
+        $userRepository = static::$container->get(UserRepository::class);
+        $testUser = $userRepository->findOneByEmail('meme@yolo.fr');
+
+        $this->client->loginUser($testUser);
     }
 
     protected function tearDown(): void
@@ -41,20 +56,6 @@ class TodolistTestIntegration extends WebTestCase
     */
     public function testVisitingWhileLoggedIn()
     {
-        $user = new User();
-        $user->setFirstname("Titi");
-        $user->setLastname("Toto");
-        $user->setBirthday(15);
-        $user->setEmail("meme@yolo.fr");
-        $user->setPassword("azertyuiop");
-        $this->em->persist($user);
-        $this->em->flush();
-
-        $userRepository = static::$container->get(UserRepository::class);
-        $testUser = $userRepository->findOneByEmail('meme@yolo.fr');
-
-        $this->client->loginUser($testUser);
-
         // le user est connecté, on vérifie la présence des éléments de la page où il est redirigé
         $this->client->request('GET', '/profile');
         $this->assertResponseIsSuccessful();
@@ -69,20 +70,6 @@ class TodolistTestIntegration extends WebTestCase
     public function testCreateTodolist()
     {
         // GIVEN
-        // on mock un user, une todolist et un client
-        $user = new User();
-        $user->setFirstname("Titi");
-        $user->setLastname("Toto");
-        $user->setBirthday(15);
-        $user->setEmail("meme@yolo.fr");
-        $user->setPassword("azertyuiop");
-        $this->em->persist($user);
-        $this->em->flush();
-
-        $userRepository = static::$container->get(UserRepository::class);
-        $testUser = $userRepository->findOneByEmail('meme@yolo.fr');
-
-        $this->client->loginUser($testUser);
         $this->todolist = [
             "name" => "My todolist",
             "description" => "My description...",
@@ -101,20 +88,7 @@ class TodolistTestIntegration extends WebTestCase
     public function userAlreadyHasTodolist()
     {
         // GIVEN
-        // on mock un user, une todolist et un client
-        $user = new User();
-        $user->setFirstname("Titi");
-        $user->setLastname("Toto");
-        $user->setBirthday(15);
-        $user->setEmail("meme@yolo.fr");
-        $user->setPassword("azertyuiop");
-        $this->em->persist($user);
-        $this->em->flush();
 
-        $userRepository = static::$container->get(UserRepository::class);
-        $testUser = $userRepository->findOneByEmail('meme@yolo.fr');
-
-        $this->client->loginUser($testUser);
         $todolist = [
             "name" => "My todolist",
             "description" => "My description...",
@@ -135,28 +109,15 @@ class TodolistTestIntegration extends WebTestCase
     public function testAddTodolist10Items()
     {
         // GIVEN
-        // on cree un utilisateur
-        $user = new User();
-        $user->setFirstname("Titi");
-        $user->setLastname("Toto");
-        $user->setBirthday(15);
-        $user->setEmail("meme@yolo.fr");
-        $user->setPassword("azertyuiop");
-        $this->em->persist($user);
-        $this->em->flush();
-
-        $userRepository = static::$container->get(UserRepository::class);
-        $testUser = $userRepository->findOneByEmail('meme@yolo.fr');
-        $this->client->loginUser($testUser);
 
         // on cree la todolist pour l'user
         $todolist = new Todolist();
         $todolist->setName("todolistName");
         $todolist->setDescription("todolistDesc");
-        $todolist->setUser($user);
-        $user->setTodolist($todolist);
+        $todolist->setUser($this->user);
+        $this->user->setTodolist($todolist);
         $this->em->persist($todolist);
-        $this->em->persist($user);
+        $this->em->persist($this->user);
         $this->em->flush();
 
         // on cree 10 items dans la todolist
@@ -183,28 +144,15 @@ class TodolistTestIntegration extends WebTestCase
     public function testAddItemOk()
     {
         // GIVEN
-        // on cree un utilisateur
-        $user = new User();
-        $user->setFirstname("Titi");
-        $user->setLastname("Toto");
-        $user->setBirthday(15);
-        $user->setEmail("meme@yolo.fr");
-        $user->setPassword("azertyuiop");
-        $this->em->persist($user);
-        $this->em->flush();
-
-        $userRepository = static::$container->get(UserRepository::class);
-        $testUser = $userRepository->findOneByEmail('meme@yolo.fr');
-        $this->client->loginUser($testUser);
 
         // on cree la todolist pour l'user
         $todolist = new Todolist();
         $todolist->setName("todolistName");
         $todolist->setDescription("todolistDesc");
-        $todolist->setUser($user);
-        $user->setTodolist($todolist);
+        $todolist->setUser($this->user);
+        $this->user->setTodolist($todolist);
         $this->em->persist($todolist);
-        $this->em->persist($user);
+        $this->em->persist($this->user);
         $this->em->flush();
 
         // on cree 1 item dans la todolist
@@ -224,28 +172,15 @@ class TodolistTestIntegration extends WebTestCase
     public function testAddTwoItemsTooSoon()
     {
         // GIVEN
-        // on cree un utilisateur
-        $user = new User();
-        $user->setFirstname("Titi");
-        $user->setLastname("Toto");
-        $user->setBirthday(15);
-        $user->setEmail("meme@yolo.fr");
-        $user->setPassword("azertyuiop");
-        $this->em->persist($user);
-        $this->em->flush();
-
-        $userRepository = static::$container->get(UserRepository::class);
-        $testUser = $userRepository->findOneByEmail('meme@yolo.fr');
-        $this->client->loginUser($testUser);
 
         // on cree la todolist pour l'user
         $todolist = new Todolist();
         $todolist->setName("todolistName");
         $todolist->setDescription("todolistDesc");
-        $todolist->setUser($user);
-        $user->setTodolist($todolist);
+        $todolist->setUser($this->user);
+        $this->user->setTodolist($todolist);
         $this->em->persist($todolist);
-        $this->em->persist($user);
+        $this->em->persist($this->user);
         $this->em->flush();
 
         // on cree 1 item dans la todolist
