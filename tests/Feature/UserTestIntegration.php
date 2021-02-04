@@ -54,7 +54,7 @@ class UserTestIntegration extends WebTestCase
             "email" => "tr@yolo.fr",
             "password" => "azertyuiop",
         ];
-        
+
 
         //WHEN
         $this->client->request('POST', '/createuser', $this->user);
@@ -67,15 +67,22 @@ class UserTestIntegration extends WebTestCase
 
     public function testVisitingWhileLoggedIn()
     {
-        $client = static::createClient();
+        $user = new User();
+        $user->setFirstname("Titi");
+        $user->setLastname("Toto");
+        $user->setBirthday(15);
+        $user->setEmail("meme@yolo.fr");
+        $user->setPassword("azertyuiop");
+        $this->em->persist($user);
+        $this->em->flush();
 
         $userRepository = static::$container->get(UserRepository::class);
-        $testUser = $userRepository->findOneByEmail('blu@yolo.fr');
+        $testUser = $userRepository->findOneByEmail('meme@yolo.fr');
 
-        $client->loginUser($testUser);
+        $this->client->loginUser($testUser);
 
         // le user est connecté, on vérifie la présence des éléments de la page où il est redirigé
-        $client->request('GET', '/profile');
+        $this->client->request('GET', '/profile');
         $this->assertResponseIsSuccessful();
         $this->assertSelectorTextContains('h1', 'User logged successfully');
     }
@@ -148,18 +155,19 @@ class UserTestIntegration extends WebTestCase
         $user->setEmail("meme@yolo.fr");
         $user->setPassword("azertyuiop");
         $this->em->persist($user);
+        $this->em->flush();
 
-        $this->user = [
+        $user2 = [
             "firstname" => "Tata",
             "lastname" => "Toto",
             "birthday" => 15,
-            "email" => "ssszsz@yolo.fr",
+            "email" => "meme@yolo.fr",
             "password" => "azertyuiop",
         ];
 
 
         //WHEN
-        $this->client->request('POST', '/createuser', $this->user);
+        $this->client->request('POST', '/createuser', $user2);
 
         // THEN
         $this->assertEquals(500, $this->client->getResponse()->getStatusCode());

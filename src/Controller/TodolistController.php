@@ -50,6 +50,40 @@ class TodolistController extends AbstractController
     }
 
     /**
+     * @Route("/todolistInte", name="todolist_inte", methods={"POST"})
+     */
+    public function createTodolistInte(Request $request, EntityManagerInterface $em): Response
+    {
+        if (!$this->getUser()) {
+            return new JsonResponse("ERROR : You aren't logged in...", 500);
+        }
+        if ($this->getUser()->getTodolist()) {
+            return new JsonResponse("ERROR : User already has a todolist...", 500);
+        }
+        $todolist = new Todolist();
+        $form = $this->createForm(TodolistType::class, $todolist);
+        $form->submit($request->request->all());
+        if ($form->isValid()) {
+            if (!$todolist->isValid()) {
+                return new JsonResponse("ERROR : something wrong !", 500);
+            }
+
+            try {
+                $todolist->setUser($this->getUser());
+                $em->persist($todolist);
+                $em->flush();
+            } catch (Exception $e) {
+                return new JsonResponse("ERROR while trying to save todolist " . $e->getMessage(), 500);
+            }
+
+            return new JsonResponse("SUCCESS : todolist created", 201);
+        }
+
+        return new JsonResponse("ERROR : Oops, something is wrong...", 500);
+    }
+
+
+    /**
      * @Route("/todolist/show", name="todolist_show", methods={"GET"})
      */
     public function showTodolist(Request $request)
@@ -66,31 +100,6 @@ class TodolistController extends AbstractController
         }
 
         return new JsonResponse("ERROR : Oops, something went wrong...", 500);
-    }
-
-    /**
-     * @Route("/todolistInte", name="todolist_inte", methods={"POST"})
-     */
-    public function createTodolistInte(Request $request, EntityManagerInterface $em): Response
-    {
-        $todolist = new Todolist();
-        $form = $this->createForm(TodolistType::class,$todolist);
-        $form->submit($request->request->all());
-
-        if ($form->isValid()) {
-
-            if(!$todolist->isValid()){
-                return new JsonResponse("ERROR : something wrong !", 500);
-            }
-
-            $em->persist($todolist);
-            $em->flush();
-
-            return new JsonResponse("SUCCESS : todolist created", 201);
-
-        }
-
-        return new JsonResponse("ERROR : Oops, something is wrong...", 500);
     }
 
 
@@ -124,6 +133,7 @@ class TodolistController extends AbstractController
             return new JsonResponse("ERROR : item is invalid !", 500);
             $em->persist($item);
         }
+
         $em->persist($item);
 
         try {

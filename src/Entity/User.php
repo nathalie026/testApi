@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Doctrine\ORM\Mapping as ORM;
 
 use PHPUnit\Runner\Exception;
+
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
  * @ORM\Table(name="`user`")
@@ -27,7 +28,7 @@ class User implements UserInterface
      */
     private $email;
 
-     /**
+    /**
      * @ORM\Column(type="json")
      */
     private $roles = [];
@@ -59,8 +60,8 @@ class User implements UserInterface
     private $Todolist;
 
 
-//    public function __construct( string $firstname, string $lastname, int $birthday, string $email, string $password)
-    public function __construct( string $firstname=null, string $lastname=null, int $birthday=null, string $email=null, string $password=null)
+    //    public function __construct( string $firstname, string $lastname, int $birthday, string $email, string $password)
+    public function __construct(string $firstname = null, string $lastname = null, int $birthday = null, string $email = null, string $password = null)
     {
         $this->firstname = $firstname;
         $this->lastname = $lastname;
@@ -70,7 +71,8 @@ class User implements UserInterface
     }
 
 
-    public function isValid()  {
+    public function isValid()
+    {
         if (empty($this->firstname))
             throw new Exception('Le prénom est vide');
         if (empty($this->lastname))
@@ -109,7 +111,7 @@ class User implements UserInterface
 
 
 
-     /**
+    /**
      * @see UserInterface
      */
     public function getPassword(): string
@@ -227,5 +229,4 @@ class User implements UserInterface
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
     }
-
 }

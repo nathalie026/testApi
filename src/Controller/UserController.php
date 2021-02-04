@@ -13,6 +13,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
+use Exception;
+
 class UserController extends AbstractController
 {
 
@@ -23,20 +25,23 @@ class UserController extends AbstractController
     public function createUser(Request $request, EntityManagerInterface $em): Response
     {
         $user = new User();
-        $form = $this->createForm(RegistrationFormType::class,$user);
+        $form = $this->createForm(RegistrationFormType::class, $user);
         $form->submit($request->request->all());
 
         if ($form->isValid()) {
-
-            if(!$user->isValid()){
+            if (!$user->isValid()) {
                 return new JsonResponse("ERROR : something wrong !", 500);
             }
 
-            $em->persist($user);
-            $em->flush();
+            $repository = $em->getRepository(User::class);
+            try {
+                $em->persist($user);
+                $em->flush();
+            } catch (Exception $e) {
+                return new JsonResponse("Error : Cannot save user " . $e->getMessage(), 500);
+            }
 
             return new JsonResponse("SUCCESS : user created", 201);
-
         }
 
         return new JsonResponse("ERROR : Oops, something is wrong...", 500);
@@ -49,21 +54,21 @@ class UserController extends AbstractController
     {
         $user = $this->getUser();
 
-        if(!$user){
+        if (!$user) {
             return new JsonResponse("ERROR : invalid credentials !", 500);
         }
 
         return new JsonResponse("SUCCESS :" . $user->getUsername() . " is logged", 201);
     }
 
-     /**
+    /**
      * @Route("/checkLogin", name="checkLogin", methods={"GET"})
      */
     public function checkLogin(Request $request)
     {
         $user = $this->getUser();
 
-        if(!$user){
+        if (!$user) {
             return new JsonResponse("ERROR : You aren't logged in !", 500);
         }
 

@@ -17,6 +17,11 @@ use Exception;
  */
 class Todolist
 {
+
+    public function __construct()
+    {
+        $this->item = new ArrayCollection();
+    }
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -102,21 +107,21 @@ class Todolist
     public function canAddItem(Item $item)
     {
         if (is_null($item) || !$item->isValid()) {
-            throw new Exception("Ton item est null ou invalide");
+            throw new Exception("Item is null or invalid");
         }
 
         if (is_null($this->user) || !$this->user->isValid()) {
-            throw new Exception("User est null ou invalide");
+            throw new Exception("User is invalid or null");
         }
 
 
         if ($this->getSizeTodoItemsCount() >= 10) {
-            throw new Exception("La ToDoList comporte beaucoup trop d items, maximum 10");
+            throw new Exception("Todolist is full, cannot includes more than 10 items");
         }
 
         $lastItem = $this->getLastItem();
         if (!is_null($this->getLastItem()) && Carbon::now()->subMinutes(30)->isBefore($lastItem->createdAt)) {
-            throw new Exception("Last item est trop récent, 30mn entre la création de 2 items");
+            throw new Exception("Last item is too recent, 30 mins is needed between item creation");
         }
         $this->AlertEightItems();
         return $item;
