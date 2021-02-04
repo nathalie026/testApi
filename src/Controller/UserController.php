@@ -56,6 +56,20 @@ class UserController extends AbstractController
         return new JsonResponse("SUCCESS :" . $user->getUsername() . " is logged", 201);
     }
 
+     /**
+     * @Route("/checkLogin", name="checkLogin", methods={"GET"})
+     */
+    public function checkLogin(Request $request)
+    {
+        $user = $this->getUser();
+
+        if(!$user){
+            return new JsonResponse("ERROR : You aren't logged in !", 500);
+        }
+
+        return new JsonResponse("SUCCESS :" . $user->getUsername() . " is logged", 201);
+    }
+
     /**
      * @Route("/profile", name="profile")
      */
