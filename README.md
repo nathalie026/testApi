@@ -22,4 +22,4 @@
 
     * Lancer l'ensemble des tests : `php vendor/bin/phpunit`
     * Lancer un test spécifique (i.e ToDoListTest.php): `php vendor/bin/phpunit tests/Unit/ToDoListTest.php`, `php vendor/bin/phpunit tests/Feature/UserTestIntegration.php` 
-    * Importer les tests d'intégration sur Postman
+    * Importer les tests d'intégration sur Postman depuis le fichier : `TodoList.postman_collection.json`
