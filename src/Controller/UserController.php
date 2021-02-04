@@ -53,7 +53,7 @@ class UserController extends AbstractController
             return new JsonResponse("ERROR : invalid credentials !", 500);
         }
 
-        return new JsonResponse("SUCCESS :" . $user->getUsername() . " is logged", 201);
+        return new JsonResponse("SUCCESS :" . $user->getUsername() . " is logged", 200);
     }
 
      /**
@@ -67,7 +67,7 @@ class UserController extends AbstractController
             return new JsonResponse("ERROR : You aren't logged in !", 500);
         }
 
-        return new JsonResponse("SUCCESS :" . $user->getUsername() . " is logged", 201);
+        return new JsonResponse("SUCCESS :" . $user->getUsername() . " is logged", 200);
     }
 
     /**
