@@ -63,14 +63,12 @@ class UserTestIntegration extends WebTestCase
     {
         $client = static::createClient();
 
-        // get or create the user somehow (e.g. creating some users only
-        // for tests while loading the test fixtures)
         $userRepository = static::$container->get(UserRepository::class);
         $testUser = $userRepository->findOneByEmail('blu@yolo.fr');
 
         $client->loginUser($testUser);
 
-        // user is now logged in, so you can test protected resources
+        // le user est connecté, on vérifie la présence des éléments de la page où il est redirigé
         $client->request('GET', '/profile');
         $this->assertResponseIsSuccessful();
         $this->assertSelectorTextContains('h1', 'User logged successfully');
