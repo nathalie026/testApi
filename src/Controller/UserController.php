@@ -42,25 +42,19 @@ class UserController extends AbstractController
         return new JsonResponse("ERROR : Oops, something is wrong...", 500);
     }
 
-    // /**
-    //  * @Route("/loging", name="loging", methods={"GET"})
-    //  */
-    // public function loging()
-    // {
-    //     $client = static::createClient();
-    //     $userRepository = static::$container->get(UserRepository::class);
+    /**
+     * @Route("/logintest", name="logintest", methods={"POST"})
+     */
+    public function logintest(Request $request)
+    {
+        $user = $this->getUser();
 
-    //     // retrieve the test user
-    //     $testUser = $userRepository->findOneByEmail('john.doe@example.com');
+        if(!$user){
+            return new JsonResponse("ERROR : invalid credentials !", 500);
+        }
 
-    //     // simulate $testUser being logged in
-    //     $client->loginUser($testUser);
-
-    //     // test e.g. the profile page
-    //     $client->request('GET', '/profile');
-    //     $this->assertResponseIsSuccessful();
-    //     // $this->assertSelectorTextContains('h1', 'Hello John!');
-    // }
+        return new JsonResponse("SUCCESS :" . $user->getUsername() . " is logged", 201);
+    }
 
     /**
      * @Route("/profile", name="profile")
