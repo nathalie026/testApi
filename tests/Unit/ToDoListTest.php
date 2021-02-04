@@ -12,8 +12,8 @@ use PHPUnit\Runner\Exception;
 class ToDoListTest extends TestCase {
 
     private User $user;
-    private $item;
-    private $Todolist;
+    private Item $item;
+    private \PHPUnit\Framework\MockObject\MockObject $Todolist;
 
 
     protected function setUp(): void
@@ -39,13 +39,14 @@ class ToDoListTest extends TestCase {
         $this->Todolist = $this->getMockBuilder(Todolist::class)
         ->onlyMethods(['getSizeTodoItemsCount', 'getLastItem', 'sendEmailToUser'])
         ->getMock();
-        $this->Todolist->user = $this->user;
-        $this->Todolist->expects($this->any())->method('getLastItem')->willReturn($this->item);
+        $this->Todolist->setUser($this->user);
+
     }
 
     public function testCanAddItemNominal()
     {
         $this->Todolist->expects($this->any())->method('getSizeTodoItemsCount')->willReturn(1);
+        $this->Todolist->expects($this->any())->method('getLastItem')->willReturn($this->item);
 
 
         $canAddItem = $this->Todolist->canAddItem($this->item);
@@ -72,4 +73,16 @@ class ToDoListTest extends TestCase {
 
         $this->assertTrue($send);
     }
+
+//    public function testAddItemTooFast()
+//    {
+//        $this->Todolist->expects($this->any())->method('getLastItem')->willReturn(1);
+//
+//
+//        $this->expectException('Exception');
+//        $this->expectExceptionMessage('Last item est trop récent, 30mn entre la création de 2 items');
+//
+//        $canAddItem = $this->Todolist->canAddItem($this->item);
+//        $this->assertFalse($canAddItem);
+//    }
 }

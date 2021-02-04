@@ -8,41 +8,241 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use PHPUnit\Runner\Exception;
 
 class UserTestIntegration extends WebTestCase
-{
 
-    private static $url = "localhost";
+
+{
+    private $user;
+    private $client;
+//    private static $url = "localhost";
+
 
     protected function setUp(): void
     {
-        // $this->user = new User('Tata', 'Tata', 13, 'toto@yolo.fr', 'azertyuiop');
+        parent::setUp();
+
         $this->user = [
             "firstname" => "Tata",
             "lastname" => "Toto",
-            "age" => 13,
+            "birthday" => 13,
             "email" => "toto@yolo.fr",
             "password" => "azertyuiop",
         ];
-        parent::setUp();
+
+//        $this->client = static::createClient();
     }
+
 
     // Test d'intégration requête OK pour création suer
-    public function testIsValidNominal()
+    public function testAddUserOk()
     {
         // GIVEN
-        // on mock un user
+       // on mock un user et un client
+        $this->user = [
+            "firstname" => "Tata",
+            "lastname" => "Toto",
+            "birthday" => 15,
+            "email" => "bluetoto@yolo.fr",
+            "password" => "azertyuiop",
+        ];
 
+        $this->client = static::createClient();
 
         //WHEN
-        // création du client
-        // $client = new Client();
-        $client = static::createClient();
-
-        // requête faite par le client avec la méthode POST car création user
-        //$response = $client->request("POST", self::$url . '/createuserok', json_encode($user));
-        $client->request('POST', "/createuserok");
+        $this->client->request('POST', '/createuser',$this->user);
 
         // THEN
-        // Et donc en retour, ce qu'on doit obtenir de cet appel, c'est le code 201 qui permet de dire que le user a été créé
-        $this->assertEquals(201, $client->getResponse()->getStatusCode());
+// Et donc en retour, ce qu'on doit obtenir de cet appel, c'est le code 201 qui permet de dire que le user a été créé
+
+        $this->assertEquals(201, $this->client->getResponse()->getStatusCode());
     }
+
+    public function testUserSoYoung()
+    {
+        // GIVEN
+        // on mock un user et un client
+        $this->user = [
+            "firstname" => "Tata",
+            "lastname" => "Toto",
+            "birthday" => 12,
+            "email" => "meme@yolo.fr",
+            "password" => "azertyuiop",
+        ];
+
+        $this->client = static::createClient();
+
+        //WHEN
+        $this->client->request('POST', '/createuser',$this->user);
+
+        // THEN
+        $this->assertEquals(500, $this->client->getResponse()->getStatusCode());
+    }
+
+    public function testPwdTooShort()
+    {
+        // GIVEN
+        // on mock un user et un client
+        $this->user = [
+            "firstname" => "Tata",
+            "lastname" => "Toto",
+            "birthday" => 10,
+            "email" => "meme@yolo.fr",
+            "password" => "azer",
+        ];
+
+        $this->client = static::createClient();
+
+        //WHEN
+        $this->client->request('POST', '/createuser',$this->user);
+
+        // THEN
+        $this->assertEquals(500, $this->client->getResponse()->getStatusCode());
+    }
+
+    public function testPwdTooLong()
+    {
+        // GIVEN
+        // on mock un user et un client
+        $this->user = [
+            "firstname" => "Tata",
+            "lastname" => "Toto",
+            "birthday" => 10,
+            "email" => "meme@yolo.fr",
+            "password" => "azedddddegfyefgyegfyegfyegfyegfyegfyegfyegfyegyfgeygfyegfyegrtyuiop",
+        ];
+
+        $this->client = static::createClient();
+
+        //WHEN
+        $this->client->request('POST', '/createuser',$this->user);
+
+        // THEN
+        $this->assertEquals(500, $this->client->getResponse()->getStatusCode());
+    }
+
+    public function testEmailExist()
+    {
+        // GIVEN
+        // on mock un user et un client
+        $this->user = [
+            "firstname" => "Tata",
+            "lastname" => "Toto",
+            "birthday" => 15,
+            "email" => "meme@yolo.fr",
+            "password" => "azertyuiop",
+        ];
+
+        $this->client = static::createClient();
+
+        //WHEN
+        $this->client->request('POST', '/createuser',$this->user);
+
+        // THEN
+        $this->assertEquals(500, $this->client->getResponse()->getStatusCode());
+    }
+
+    public function testEmptyFirstname()
+    {
+        // GIVEN
+        // on mock un user et un client
+        $this->user = [
+            "firstname" => "",
+            "lastname" => "Toto",
+            "birthday" => 14,
+            "email" => "meme@yolo.fr",
+            "password" => "azertyuiop",
+        ];
+
+        $this->client = static::createClient();
+
+        //WHEN
+        $this->client->request('POST', '/createuser',$this->user);
+
+        // THEN
+        $this->assertEquals(500, $this->client->getResponse()->getStatusCode());
+    }
+
+    public function testEmptyLastname()
+    {
+        // GIVEN
+        // on mock un user et un client
+        $this->user = [
+            "firstname" => "Yo",
+            "lastname" => "",
+            "birthday" => 14,
+            "email" => "meme@yolo.fr",
+            "password" => "azertyuiop",
+        ];
+
+        $this->client = static::createClient();
+
+        //WHEN
+        $this->client->request('POST', '/createuser',$this->user);
+
+        // THEN
+        $this->assertEquals(500, $this->client->getResponse()->getStatusCode());
+    }
+
+    public function testEmptyBirthday()
+    {
+        // GIVEN
+        // on mock un user et un client
+        $this->user = [
+            "firstname" => "zddzz",
+            "lastname" => "Toto",
+            "birthday" => '',
+            "email" => "meme@yolo.fr",
+            "password" => "azertyuiop",
+        ];
+
+        $this->client = static::createClient();
+
+        //WHEN
+        $this->client->request('POST', '/createuser',$this->user);
+
+        // THEN
+        $this->assertEquals(500, $this->client->getResponse()->getStatusCode());
+    }
+
+    public function testEmptyEmail()
+    {
+        // GIVEN
+        // on mock un user et un client
+        $this->user = [
+            "firstname" => "",
+            "lastname" => "Toto",
+            "birthday" => 120,
+            "email" => "",
+            "password" => "azertyuiop",
+        ];
+
+        $this->client = static::createClient();
+
+        //WHEN
+        $this->client->request('POST', '/createuser',$this->user);
+
+        // THEN
+        $this->assertEquals(500, $this->client->getResponse()->getStatusCode());
+    }
+
+    public function testEmptyPwd()
+    {
+        // GIVEN
+        // on mock un user et un client
+        $this->user = [
+            "firstname" => "ded",
+            "lastname" => "Toto",
+            "birthday" => 130,
+            "email" => "meme@yolo.fr",
+            "password" => "",
+        ];
+
+        $this->client = static::createClient();
+
+        //WHEN
+        $this->client->request('POST', '/createuser',$this->user);
+
+        // THEN
+        $this->assertEquals(500, $this->client->getResponse()->getStatusCode());
+    }
+
 }

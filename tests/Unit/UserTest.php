@@ -72,6 +72,7 @@ class UserTest extends TestCase {
         $this->assertEquals('Le mot de passe doit faire entre 8 et 40 caractères', $exception->getMessage());
     }
 
+
     public function testIsValidPassword()
     {
         $this->user->setPassword('ededeazer');

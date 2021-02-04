@@ -6,32 +6,40 @@ use App\Form\RegistrationFormType;
 use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
-use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\Controller\FOSRestController;
-use Symfony\Component\HttpFoundation\Request;
-use Doctrine\ORM\EntityManagerInterface;
 
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Routing\Annotation\Route;
 
 class UserController extends AbstractController
 {
-    /**
-     * @Route("/createuserok", methods={"POST"})
-     */
-    public function createuserok(Request $request, EntityManagerInterface $entityManagerInterface)
-    {
-        $user = new User("salome", "test", 13, "test@live.fr", "azertyuiop");
 
-        $form = $this->createForm(RegistrationFormType::class, $user);
+
+    /**
+     * @Route("/createuser", name="createuser", methods={"POST"})
+     */
+    public function createUser(Request $request, EntityManagerInterface $em): Response
+    {
+        $user = new User();
+        $form = $this->createForm(RegistrationFormType::class,$user);
         $form->submit($request->request->all());
 
         if ($form->isValid()) {
-            $entityManager->persist($user);
-            $entityManager->flush();
 
-            return new Response("User create OK", 201);
+            if(!$user->isValid()){
+                return new JsonResponse("ERROR : something wrong !",500);
+            }
+
+            $em->persist($user);
+            $em->flush();
+
+            return new JsonResponse("SUCCESS : user created", 201);
+
         }
 
-        return new JsonResponse($form->getErrors());
+        return new JsonResponse("ERROR : Oops, something is wrong...", 500);
     }
+
+    // créer méthode login
 }
