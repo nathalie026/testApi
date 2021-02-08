@@ -1,13 +1,13 @@
-language: node_js
+language: php
 
-node_js:
-  - 12.16.1
+php:
+  - 17.4.10
 
 cache: npm
 
-install: npm install
+install: composer install
 
-script: npm run test-with-coverage
+script: php vendor/bin/phpunit
 
 deploy:
   skip_cleanup: true
