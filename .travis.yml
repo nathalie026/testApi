@@ -3,51 +3,16 @@ language: node_js
 node_js:
   - 12.16.1
 
-# échoue dès qu'une erreur intervient
-matrix:
-  fast_finish: true
-
-# met en cache node_modules, à noter que dans ce genre d’utilisation pour des
-# bibliothèques open source consommées via npm, il ne faudra pas oublier
-# npm prune utilisé ci-après, histoire de ne pas lancer des tests avec
-# des paquets encore en cache mais non présents dans le package.json
-cache:
-  directories:
-    - node_modules
-
-before_install:
-  - npm prune
+cache: npm
 
 install: npm install
-# ici on peut mettre des commandes à utiliser avec le script
-before_script:
-  # certains runners comme karma, testem ou testling peuvent avoir
-  # besoin d'un écran pour fonctionner, voici l'astuce :)
-  - export DISPLAY=:99.0
-  - sh -e /etc/init.d/xvfb start
 
-# si on veut utiliser autre chose que la commande par défaut
 script: npm run test-with-coverage
 
-# voici un exemple de ce que l’on peut faire après les tests :
-# on peut lancer une tâche qui va envoyer les informations de
-# pourcentage de couverture de code à un service tiers.
-# (eg: http://coveralls.io/, https://codecov.io/)
-after_success: 'npm run coverage'
-
-# partie intéressante : ici on ne va déployer que les commits sur la
-# branche master uniquement pour une version de node
-# (car sinon on déploierait plusieurs fois…)
 deploy:
   skip_cleanup: true
-  provider: script
-  script: ./scripts/deploy.sh
-  github-token:
+  provider: pages
+  github-token: e7487786e37a1613e95022acfa09bce1f827d362
   on:
     branch: develop
 
-
-# variables d'env
-env:
-  global:
-    - NODE_ENV=production
