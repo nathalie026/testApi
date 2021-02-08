@@ -12,7 +12,7 @@ script: npm run test-with-coverage
 deploy:
   skip_cleanup: true
   provider: pages
-  github-token: e7487786e37a1613e95022acfa09bce1f827d362
+  github-token: $GITHUB_TOKEN
   on:
     branch: develop
 
