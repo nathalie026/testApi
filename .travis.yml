@@ -1,14 +1,17 @@
-language: node_js
-
-node_js:
-  - 12.16.1
-
+language: php
+php:
+  - 7.4
+warnings_are_errors: false
 cache: npm
-
-install: npm install
-
-script: npm run test-with-coverage
-
+sudo: false
+before_script:
+  - composer self-update
+  - composer install --prefer-source --no-interaction --dev
+install:
+  - composer install
+script: php vendor/bin/phpunit
+services:
+  - mysql
 deploy:
   skip_cleanup: true
   provider: pages
