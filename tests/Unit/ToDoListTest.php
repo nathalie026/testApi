@@ -56,10 +56,10 @@ class ToDoListTest extends TestCase {
     }
 
     public function testCantAddItemMax(){
-        $this->Todolist->expects($this->any())->method('getSizeTodoItemsCount')->willReturn(10);
+        $this->Todolist->expects($this->any())->method('getSizeTodoItemsCount')->willReturn(11);
 
         $this->expectException('Exception');
-        $this->expectExceptionMessage('La ToDoList comporte beaucoup trop d items, maximum 10');
+        $this->expectExceptionMessage('Todolist is full, cannot includes more than 10 items');
 
         $canAddItem = $this->Todolist->canAddItem($this->item);
         $this->assertTrue($canAddItem);
