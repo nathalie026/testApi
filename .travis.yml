@@ -1,12 +1,14 @@
 language: php
-
 php:
-  - 17.4.10
+  - 7.1.9
 
 cache: npm
 
-install: composer install
-
+install:
+  - ./bin/ci/install_dependencies.sh
+  - php vendor/vendors.php
+before_script:
+  - curl -sSfL -o ~/.phpenv/versions/hhvm/bin/phpunit https://phar.phpunit.de/phpunit-5.7.phar
 script: php vendor/bin/phpunit
 
 deploy:
