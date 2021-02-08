@@ -12,10 +12,10 @@ install:
 script: php vendor/bin/phpunit
 services:
   - mysql
-deploy:
-  skip_cleanup: true
-  provider: pages
-  github-token: $GITHUB_TOKEN
-  on:
-    branch: master
+#deploy:
+#  skip_cleanup: true
+#  provider: pages
+#  github-token: $GITHUB_TOKEN
+#  on:
+#    branch: master
 
