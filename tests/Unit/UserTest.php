@@ -25,52 +25,61 @@ class UserTest extends TestCase {
     public function testIsNotValidDueToEmptyFirstnameAndReturnException()
     {
         $this->user->setFirstname('');
-        $exception = $this->user->isValid();
-        $this->assertEquals('Le prénom est vide', $exception->getMessage());
+        $this->expectException('Exception');
+        $this->expectExceptionMessage('Le prénom est vide');
+        $this->assertFalse($this->user->isValid());
     }
 
     public function testIsNotValidDueToEmptyLastnameAndReturnException()
     {
         $this->user->setLastname('');
-        $exception = $this->user->isValid();
-        $this->assertEquals('Le nom est vide', $exception->getMessage());
+        $this->expectException('Exception');
+        $this->expectExceptionMessage('Le nom est vide');
+        $this->assertFalse($this->user->isValid());
     }
 
     public function testIsNotValidDueToEmptyEmailAndReturnException()
     {
         $this->user->setEmail('');
-        $exception = $this->user->isValid();
-        $this->assertEquals('L\'email est vide', $exception->getMessage());
+        $this->expectException('Exception');
+        $this->expectExceptionMessage('L\'email est vide');
+        $this->assertFalse($this->user->isValid());
     }
 
     public function testIsNotValidDueToBadEmailAndReturnException()
     {
         $this->user->setEmail('pasbon');
-        $exception = $this->user->isValid();
-        $this->assertEquals('Format d\'email non valide', $exception->getMessage());
+        $this->expectException('Exception');
+        $this->expectExceptionMessage('Format d\'email non valide');
+        $this->assertFalse($this->user->isValid());
     }
 
     public function testIsNotValidDueToBirthdayToYoungAndReturnException()
     {
         $this->user->setBirthday(8);
-        $exception = $this->user->isValid();
-        $this->assertEquals('L\'utilisateur doit  être agé de 13 ans au minimum', $exception->getMessage());
+        $this->expectException('Exception');
+        $this->expectExceptionMessage('L\'utilisateur doit  être agé de 13 ans au minimum');
+        $this->assertFalse($this->user->isValid());
     }
 
 
     public function testIsNotValidDueToEmptyPasswordAndReturnException()
     {
         $this->user->setPassword('');
-        $exception = $this->user->isValid();
-        $this->assertEquals('Le mot de passe est vide', $exception->getMessage());
+        $this->expectException('Exception');
+        $this->expectExceptionMessage('Le mot de passe est vide');
+        $this->assertFalse($this->user->isValid());
+
     }
 
     public function testIsNotValidDueToLengthPasswordAndReturnException()
     {
         $this->user->setPassword('eded');
-        $exception = $this->user->isValid();
-        $this->assertEquals('Le mot de passe doit faire entre 8 et 40 caractères', $exception->getMessage());
+        $this->expectException('Exception');
+        $this->expectExceptionMessage('Le mot de passe doit faire entre 8 et 40 caractères');
+        $this->assertFalse($this->user->isValid());
     }
+
 
     public function testIsValidPassword()
     {

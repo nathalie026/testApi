@@ -3,12 +3,13 @@
 namespace App\Entity;
 
 use App\Repository\TodolistRepository;
+use App\Services\EmailService;
 use Carbon\Carbon;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Exception;
-use App\Service\EmailService;
+
 
 
 /**
@@ -16,6 +17,11 @@ use App\Service\EmailService;
  */
 class Todolist
 {
+
+    public function __construct()
+    {
+        $this->item = new ArrayCollection();
+    }
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -31,7 +37,8 @@ class Todolist
 
 
     /**
-     * @ORM\OneToMany(targetEntity=Item::class, mappedBy="Todolist", , orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity=Item::class, mappedBy="Todolist", orphanRemoval=true)
+     * @ORM\OrderBy({"createdAt" = "ASC"})
      */
     private $item;
 
@@ -45,10 +52,6 @@ class Todolist
      */
     private $description;
 
-    public function __construct()
-    {
-        $this->item = new ArrayCollection();
-    }
 
     public function getId(): ?int
     {
@@ -87,7 +90,7 @@ class Todolist
         return $this;
     }
 
-    public function isValid(): bool
+    public function isValid()
     {
         return !empty($this->name)
             && strlen($this->name) <= 255
@@ -101,23 +104,24 @@ class Todolist
      * @throws Exception
      */
 
-    public function canAddItem(Item $item) {
+    public function canAddItem(Item $item)
+    {
         if (is_null($item) || !$item->isValid()) {
-            throw new Exception("Ton item est null ou invalide");
+            throw new Exception("Item is null or invalid");
         }
 
-        /* if (is_null($this->user) || !$this->user->isValid() ) {
-            throw new Exception("User est null ou invalide");
-        } */
+        if (is_null($this->user) || !$this->user->isValid()) {
+            throw new Exception("User is invalid or null");
+        }
 
 
         if ($this->getSizeTodoItemsCount() >= 10) {
-            throw new Exception("La ToDoList comporte beaucoup trop d items, maximum 10");
+            throw new Exception("Todolist is full, cannot includes more than 10 items");
         }
 
         $lastItem = $this->getLastItem();
         if (!is_null($this->getLastItem()) && Carbon::now()->subMinutes(30)->isBefore($lastItem->createdAt)) {
-            throw new Exception("Last item est trop récent, 30mn entre la création de 2 items");
+            throw new Exception("Last item is too recent, 30 mins is needed between item creation");
         }
         $this->AlertEightItems();
         return $item;
@@ -125,18 +129,22 @@ class Todolist
 
     public function AlertEightItems()
     {
-        if($this->getSizeTodoItemsCount() == 8)
-        {
+        if ($this->getSizeTodoItemsCount() == 8) {
             $this->sendEmailToUser();
             return true;
         }
     }
 
-    public function getLastItem(): ?Item {
+    public function getLastItem(): ?Item
+    {
+        if (!$this->getItem()->last()) {
+            return null;
+        };
         return $this->getItem()->last();
     }
 
-    public function getSizeTodoItemsCount() {
+    public function getSizeTodoItemsCount()
+    {
         return sizeof($this->getItem());
     }
 
@@ -144,7 +152,7 @@ class Todolist
     {
         $emailService = new EmailService();
         $mailer = new \Swift_Mailer();
-        $emailService->sendMail('Il vous reste 2 items',$this->user->getEmail(), $mailer);
+        $emailService->sendMail('Il vous reste 2 items', $this->user->getEmail(), $mailer);
     }
 
     public function getName(): ?string
