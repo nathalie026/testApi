@@ -5,11 +5,13 @@ php:
 cache: npm
 
 install:
-  - php vendor/vendors.php
-before_script:
-  - curl -sSfL -o ~/.phpenv/versions/hhvm/bin/phpunit https://phar.phpunit.de/phpunit-5.7.phar
+  - composer install --prefer-dist --no-interaction
+  - php bin/console doctrine:database:create --env=test
+  - php bin/console doctrine:schema:update --force --env=test
+  - php bin/console doctrine:fixtures:load -n --env=test
 script: php vendor/bin/phpunit
-
+services:
+  - mysql
 deploy:
   skip_cleanup: true
   provider: pages
