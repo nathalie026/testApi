@@ -3,12 +3,13 @@
 namespace App\Entity;
 
 use App\Repository\TodolistRepository;
+use App\Services\EmailService;
 use Carbon\Carbon;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Exception;
-use App\Service\EmailService;
+
 
 
 /**
@@ -16,6 +17,11 @@ use App\Service\EmailService;
  */
 class Todolist
 {
+
+    public function __construct()
+    {
+        $this->item = new ArrayCollection();
+    }
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -24,15 +30,17 @@ class Todolist
     private $id;
 
     /**
-     * @ORM\OneToOne(targetEntity=User::class, inversedBy="todolist", cascade={"persist", "remove"})
+     * @ORM\OneToOne(targetEntity=User::class, inversedBy="Todolist", cascade={"persist", "remove"})
      * @ORM\JoinColumn(nullable=false)
      */
     private $user;
 
+
     /**
-     * @ORM\OneToMany(targetEntity=Item::class, mappedBy="Todolist")
+     * @ORM\OneToMany(targetEntity=Item::class, mappedBy="Todolist", orphanRemoval=true)
+     * @ORM\OrderBy({"createdAt" = "ASC"})
      */
-    private $items;
+    private $item;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -44,10 +52,6 @@ class Todolist
      */
     private $description;
 
-    public function __construct()
-    {
-        $this->items = new ArrayCollection();
-    }
 
     public function getId(): ?int
     {
@@ -70,39 +74,28 @@ class Todolist
     /**
      * @return Collection|Item[]
      */
-    public function getItems(): Collection
+    public function getItem(): Collection
     {
-        return $this->items;
+        return $this->item;
     }
-
-    public function addItem(Item $item): self
-    {
-        if (!$this->items->contains($item)) {
-            $this->items[] = $item;
-            $item->setTodolist($this);
-        }
-
-        return $this;
-    }
-
     public function removeItem(Item $item): self
     {
-        if ($this->items->removeElement($item)) {
+        if ($this->item->removeElement($item)) {
             // set the owning side to null (unless already changed)
-            if ($item->getTodolist() === $this) {
-                $item->setTodolist(null);
+            if ($item->getTodoList() === $this) {
+                $item->setTodoList(null);
             }
         }
 
         return $this;
     }
 
-    public function isValid(): bool
+    public function isValid()
     {
         return !empty($this->name)
             && strlen($this->name) <= 255
             && !empty($this->user)
-            && (is_null($this->description) || strlen($this->description) <= 255);
+            && is_null($this->description) || strlen($this->description) <= 255;
     }
 
     /**
@@ -111,22 +104,24 @@ class Todolist
      * @throws Exception
      */
 
-    public function canAddItem(Item $item) : Item {
+    public function canAddItem(Item $item)
+    {
         if (is_null($item) || !$item->isValid()) {
-            throw new Exception("Ton item est null ou invalide");
+            throw new Exception("Item is null or invalid");
         }
 
-        if (is_null($this->user) || !$this->user->isValid() ) {
-            throw new Exception("User est null ou invalide");
+        if (is_null($this->user) || !$this->user->isValid()) {
+            throw new Exception("User is invalid or null");
         }
+
 
         if ($this->getSizeTodoItemsCount() >= 10) {
-            throw new Exception("La ToDoList comporte beaucoup trop d items, maximum 10");
+            throw new Exception("Todolist is full, cannot includes more than 10 items");
         }
 
         $lastItem = $this->getLastItem();
         if (!is_null($this->getLastItem()) && Carbon::now()->subMinutes(30)->isBefore($lastItem->createdAt)) {
-            throw new Exception("Last item est trop récent, 30mn entre la création de 2 items");
+            throw new Exception("Last item is too recent, 30 mins is needed between item creation");
         }
         $this->AlertEightItems();
         return $item;
@@ -134,26 +129,30 @@ class Todolist
 
     public function AlertEightItems()
     {
-        if($this->getSizeTodoItemsCount() == 8)
-        {
+        if ($this->getSizeTodoItemsCount() == 8) {
             $this->sendEmailToUser();
             return true;
         }
     }
 
-    public function getLastItem(): ?Item {
-        return $this->getItems()->last();
+    public function getLastItem(): ?Item
+    {
+        if (!$this->getItem()->last()) {
+            return null;
+        };
+        return $this->getItem()->last();
     }
 
-    public function getSizeTodoItemsCount() {
-        return sizeof($this->getItems());
+    public function getSizeTodoItemsCount()
+    {
+        return sizeof($this->getItem());
     }
 
     protected function sendEmailToUser()
     {
         $emailService = new EmailService();
         $mailer = new \Swift_Mailer();
-        $emailService->sendMail('Il vous reste 2 items',$this->user->getEmail(), $mailer);
+        $emailService->sendMail('Il vous reste 2 items', $this->user->getEmail(), $mailer);
     }
 
     public function getName(): ?string

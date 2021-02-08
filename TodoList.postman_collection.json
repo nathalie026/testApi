@@ -1,0 +1,274 @@
+{
+	"info": {
+		"_postman_id": "ff8aeeb3-2f50-4160-a833-0227b5b2dccf",
+		"name": "TodoList (all)",
+		"description": "1) Créer un utilisateur\n2) Se logguer avec l'email et le mdp\n3) Créer une todolist\n4) Créer un item dans la todolist",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "create user",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "firstname",
+							"value": "Tata",
+							"type": "text"
+						},
+						{
+							"key": "lastname",
+							"value": "toto",
+							"type": "text"
+						},
+						{
+							"key": "email",
+							"value": "momo@momo.frd",
+							"type": "text"
+						},
+						{
+							"key": "birthday",
+							"value": "15",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "azertyuiop",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8000/createuser",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"createuser"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": null,
+							"disabled": true
+						}
+					]
+				},
+				"description": "create user"
+			},
+			"response": []
+		},
+		{
+			"name": "login test",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"security\": {\n        \"credentials\":{\n            \"login\": \"user@user.com\",\n            \"password\": \"azertyuiop\"\n        }\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/logintest",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"logintest"
+					]
+				},
+				"description": "log with user email and password"
+			},
+			"response": []
+		},
+		{
+			"name": "check login",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"security\": {\n        \"credentials\": {\n            \"login\" : \"user@user.com\",\n            \"password\": \"azertyuiop\"\n        }\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/checkLogin",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"checkLogin"
+					]
+				},
+				"description": "check if user is logged"
+			},
+			"response": []
+		},
+		{
+			"name": "create todolist",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "name",
+							"value": "list",
+							"type": "text"
+						},
+						{
+							"key": "description",
+							"value": "hola",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8000/todolistInte",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"todolistInte"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": "list",
+							"disabled": true
+						},
+						{
+							"key": "",
+							"value": "hola",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "show todolist",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/todolist/show",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"todolist",
+						"show"
+					]
+				},
+				"description": "display user todolist"
+			},
+			"response": []
+		},
+		{
+			"name": "add item in todolist",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "content",
+							"value": "test2",
+							"type": "text"
+						},
+						{
+							"key": "name",
+							"value": "name91",
+							"type": "text"
+						},
+						{
+							"key": "N",
+							"value": "",
+							"type": "text",
+							"disabled": true
+						}
+					],
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/todolist/additem",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"todolist",
+						"additem"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

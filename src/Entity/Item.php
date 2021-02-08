@@ -19,7 +19,7 @@ class Item
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Todolist::class, inversedBy="items")
+     * @ORM\ManyToOne(targetEntity=Todolist::class, inversedBy="item")
      */
     private $Todolist;
 

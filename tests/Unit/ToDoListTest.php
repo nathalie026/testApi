@@ -11,55 +11,57 @@ use PHPUnit\Runner\Exception;
 
 class ToDoListTest extends TestCase {
 
-    private $user;
-    private $items;
-    private $Todolist;
+    private User $user;
+    private Item $item;
+    private \PHPUnit\Framework\MockObject\MockObject $Todolist;
 
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->user = new User(
-            'toto',
-            'tata',
-            Carbon::now()->subDecades(3)->subMonths(5)->subDays(22),
-            'test@test.com',
-            'azertyuioiop',
-        );
 
-        $this->items = new Item(
+        $this->item = new Item(
             'nom to do',
             'description de la todo',
             Carbon::now()->subHour(),
+        );
+
+        $this->user = new User(
+            'toto',
+            'tata',
+            14,
+            'test@test.com',
+            'azertyuioiop',
         );
 
 
         $this->Todolist = $this->getMockBuilder(Todolist::class)
         ->onlyMethods(['getSizeTodoItemsCount', 'getLastItem', 'sendEmailToUser'])
         ->getMock();
-        $this->Todolist->user = $this->user;
-        $this->Todolist->expects($this->any())->method('getLastItem')->willReturn($this->items);
+        $this->Todolist->setUser($this->user);
+
     }
 
     public function testCanAddItemNominal()
     {
         $this->Todolist->expects($this->any())->method('getSizeTodoItemsCount')->willReturn(1);
+        $this->Todolist->expects($this->any())->method('getLastItem')->willReturn($this->item);
 
 
-        $canAddItem = $this->Todolist->canAddItem($this->items);
+        $canAddItem = $this->Todolist->canAddItem($this->item);
 
         $this->assertNotNull($canAddItem);
         $this->assertEquals('nom to do', $canAddItem->getName());
     }
 
     public function testCantAddItemMax(){
-        $this->Todolist->expects($this->any())->method('getSizeTodoItemsCount')->willReturn(10);
+        $this->Todolist->expects($this->any())->method('getSizeTodoItemsCount')->willReturn(11);
 
         $this->expectException('Exception');
-        $this->expectExceptionMessage('La ToDoList comporte beaucoup trop d items, maximum 10');
+        $this->expectExceptionMessage('Todolist is full, cannot includes more than 10 items');
 
-        $canAddItem = $this->Todolist->canAddItem($this->items);
+        $canAddItem = $this->Todolist->canAddItem($this->item);
         $this->assertTrue($canAddItem);
     }
 
@@ -71,4 +73,16 @@ class ToDoListTest extends TestCase {
 
         $this->assertTrue($send);
     }
+
+//    public function testAddItemTooFast()
+//    {
+//        $this->Todolist->expects($this->any())->method('getLastItem')->willReturn(1);
+//
+//
+//        $this->expectException('Exception');
+//        $this->expectExceptionMessage('Last item est trop récent, 30mn entre la création de 2 items');
+//
+//        $canAddItem = $this->Todolist->canAddItem($this->item);
+//        $this->assertFalse($canAddItem);
+//    }
 }
